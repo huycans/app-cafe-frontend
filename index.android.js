@@ -8,19 +8,14 @@ import React, { Component } from 'react';
 import {
   AppRegistry,
   StyleSheet,
-  Text,
-  View,
-  TouchableHighlight,
-  TextInput,
-  Alert
 } from 'react-native';
 //import * as firebase from "firebase";
 import firebase from './components/firebase/firebase.js';
 
-import {StackNavigator} from 'react-navigation';
 import createNavigationalScreens from "./components/screens/Screens";
 
 var config = {
+
   apiKey: "AIzaSyCHZyeWflrZJkJVbR_xiwSBYuwqdF3PBK0",
   authDomain: "app-cafe.firebaseapp.com",
   databaseURL: "https://app-cafe.firebaseio.com",
@@ -38,30 +33,34 @@ export default class CafeApp extends Component {
     super();
     this.state = {
       isSignedIn: false
-    }
+    };
+    this.checkIfSignedIn = this.checkIfSignedIn.bind(this);
   }
+
   checkIfSignedIn() {
+    console.log("checking authstate");
     firebase.auth().onAuthStateChanged(function (user) {
       if (user) {
         // User is signed in.
-        this.setState({ isSignedIn: true })
+        this.setState({ isSignedIn: true });
       } else {
         // User is signed out.
-        this.setState({ isSignedIn: false })
+        this.setState({ isSignedIn: false });
       }
     });
   }
 
   componetDidMount() {
-    checkIfSignedIn();
+    this.checkIfSignedIn();
   }
 
   render() {
     const signedIn = this.state.isSignedIn;
     const Layout = createNavigationalScreens(signedIn);
-      
+
     return (
-        <Layout />
+      <Layout />
+
     );
   }
 }

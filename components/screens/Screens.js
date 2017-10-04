@@ -1,43 +1,18 @@
 
 import React, { Component } from 'react';
 import {
-    AppRegistry,
     StyleSheet,
     Text,
     View,
     TouchableHighlight,
     TextInput,
-    Button
+    Button,
+    Image,
+    KeyboardAvoidingView,
+
 } from 'react-native';
-import { StackNavigator } from 'react-navigation'
-import { AccessToken, LoginManager } from 'react-native-fbsdk';
-import { GoogleSignin, GoogleSigninButton } from 'react-native-google-signin';
-/**Firebase initilization is done in firebase.js level */
-//import * as firebase from "firebase";
-import firebase from '../firebase/firebase.js';
-
-//constants for api access
-const serverIp = '172.16.4.209:8080';
-const serverLink = '/ebolo-app-cafe/rest-api';
-const api = '/auth';
-let uri = 'http://' + serverIp + serverLink + api;
-
-async function verifyToken(token) {
-    try {
-        let response = await fetch(uri, {
-            method: 'POST',
-            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', },
-            body: JSON.stringify({
-                "clientIdToken": tokenEmail,
-                "fcmKey": "string"
-            })
-        });
-        console.log(response);
-    }
-    catch (error) {
-        console.log(error);
-    }
-}
+import { StackNavigator } from 'react-navigation';
+import authFunctions from '../signInAndUp/signInAndUp.js';
 
 //the first screen that welcome the user when they are not signed in
 class SigninAndSignup extends Component {
@@ -46,18 +21,14 @@ class SigninAndSignup extends Component {
         this.state = {
             email: '',
             password: '',
-            errorMessage: ''
-        }
+        };
 
-        this.signinFb = this.signinFb.bind(this);
-        this.signinGoogle = this.signinGoogle.bind(this);
-        this.signupEmail = this.signupEmail.bind(this);
         this.handleInputEmail = this.handleInputEmail.bind(this);
         this.handleInputPassword = this.handleInputPassword.bind(this);
     }
 
     componentDidMount() {
-        this.setupGoogleSignin();
+        authFunctions.setupGoogleSignin();
     }
 
     handleInputEmail(text) {
@@ -68,164 +39,66 @@ class SigninAndSignup extends Component {
         this.setState({ password: text });
     }
 
-    async signinFb() {
-        //navigation function, passed down by StackNavigator, used to navigate to other screens
-        const { navigate } = this.props.navigation;
-
-        LoginManager
-            .logInWithReadPermissions(['public_profile', 'email'])
-            .then((result) => {
-                console.log('Trying to log in');
-                if (result.isCancelled) {
-                    return Promise.resolve('cancelled');
-                }
-                console.log(`Login success with permissions: ${result.grantedPermissions.toString()}`);
-                // get the access token
-                return AccessToken.getCurrentAccessToken();
-            })
-            .then(data => {
-                if (data === 'cancelled') return Promise.resolve(data);
-                // create a new firebase credential with the token
-                const credential = firebase.auth.FacebookAuthProvider.credential(data.accessToken);
-
-                // login with credential
-                return firebase.auth().signInWithCredential(credential);
-            })
-            .then((currentUser) => {
-                if (currentUser === 'cancelled') {
-                    console.log('Login cancelled');
-                } else {
-                    // now signed in
-                    //console.warn(JSON.stringify(currentUser.toJSON()));
-                    console.log(currentUser);
-                    //send currentUser to server
-                    //...
-
-                    navigate('SignedIn');
-                }
-            })
-            .catch((error) => {
-                console.log(`Login fail with error: ${error}`);
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                this.setState({ errorMessage: errorMessage });
-            });
-    }
-    //google signin must be configure before login
-    async setupGoogleSignin() {
-        try {
-            await GoogleSignin.hasPlayServices({ autoResolve: true });
-            //this method is mandatory
-            await GoogleSignin.configure({
-                webClientId: '301035346897-gbeg8ouav7fbpb28c3q3lk34qoskvrno.apps.googleusercontent.com',
-                offlineAccess: false
-            });
-        }
-        catch (err) {
-            console.log("Play services error", err.code, err.message);
-        }
-    }
-
-    async signinGoogle() {
-        const { navigate } = this.props.navigation;
-
-        try {
-            //This method give you the current user if already login or null if not yet signin.
-            const user = await GoogleSignin.currentUserAsync();
-            if (user == null) {
-                user = await GoogleSignin.signIn();
-            }
-            console.log('Successful signin with user: ${user}');
-
-            //link to google firebase
-            const credential = firebase.auth.GoogleAuthProvider.credential(user.idToken);
-            let data = await firebase.auth().signInWithCredential(credential);
-            if (data) navigate('SignedIn');
-            //send to server
-            //verifyToken(token);
-        }
-        catch (err) {
-            console.log('error when signing in', err);
-        }
-    }
-
-    async signupEmail() {
-        const { navigate } = this.props.navigation;
-        const email = this.state.email;
-        const pass = this.state.password;
-        try {
-            await firebase.auth()
-                .createUserWithEmailAndPassword(email, pass);
-            navigate('EmailSignin');
-        } catch (error) {
-            // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            // [START_EXCLUDE]
-            if (errorCode == 'auth/weak-password') {
-                alert('The password is too weak.');
-            } else {
-                alert(errorMessage);
-            }
-            // [END_EXCLUDE]
-        }
-    }
-
-
     render() {
         const { navigate } = this.props.navigation;
-        const errorDisplay = this.state.errorMessage !== ''
-            ? <Text style={styles.error}>{this.state.errorMessage}</Text>
-            : null;
+        const email = this.state.email;
+        const password = this.state.password;
+
         return (
-            <View style={styles.container}>
 
-                <TouchableHighlight style={styles.button} onPress={this.signinFb} underlayColor="white" activeOpacity={0.5}>
-                    <Text style={styles.instructions}>Sign in with Facebook</Text>
-                </TouchableHighlight>
+            <Image source={require('../../img/vertical-background.png')}
+                style={styles.container} >
+                <View style={{
+                    flex: 1, marginTop: 250, backgroundColor: 'white',
+                    borderRadius: 6, padding: 10, 
+                }}>
+                    <TextInput autoCorrect={false} placeholder="Email" style={styles.input} keyboardType={'email-address'}
+                        onChangeText={(text) => this.handleInputEmail(text)}
+                        value={this.state.email} />
+                    <TextInput autoCorrect={false} placeholder="Password" style={styles.input}
+                        onChangeText={(text) => this.handleInputPassword(text)}
+                        value={this.state.password}
+                        secureTextEntry={true} />
+                    <TouchableHighlight
+                        style={[styles.button,
+                        { backgroundColor: "#cccc00", minWidth: 100, marginTop: 15 }]}
+                        onPress={(email, password, navigate) => authFunctions.signinEmail()} underlayColor="transparent" activeOpacity={0.5}>
+                        <Text style={styles.baseText}>Sign in</Text>
+                    </TouchableHighlight>
 
-                <TouchableHighlight style={styles.button} onPress={this.signinGoogle} underlayColor="white" activeOpacity={0.5}>
-                    <Text style={styles.instructions}>Sign in with Google</Text>
-                </TouchableHighlight>
+                </View>
 
-                <TouchableHighlight style={styles.button} onPress={() => navigate('EmailSignin')} underlayColor="white" activeOpacity={0.5}>
-                    <Text style={styles.instructions}>Sign in with Email</Text>
-                </TouchableHighlight>
+                <View style={{ flex: 0.8, flexDirection: 'row', justifyContent: 'space-between', marginTop: 30 }}>
+                    <TouchableHighlight style={styles.button} onPress={(navigate) => authFunctions.signinFb()} underlayColor="transparent" activeOpacity={0.5}>
+                        <Image source={require('../../img/facebookLogo.png')} style={{ width: 60, height: 60 }} />
+                    </TouchableHighlight>
+                    <TouchableHighlight style={styles.button} onPress={(navigate) => authFunctions.signinGoogle()} underlayColor="transparent" activeOpacity={0.5}>
+                        <Image source={require('../../img/googleLogo.png')} style={{ width: 60, height: 60 }} />
+                    </TouchableHighlight>
+                </View>
 
-                <Text style={styles.bold}> OR </Text>
-                <Text style={styles.bold}>Sign up with Email</Text>
-                <TextInput autoCorrect={false} placeholder="Email" style={styles.input} keyboardType={'email-address'}
-                    onChangeText={(text) => this.handleInputEmail(text)}
-                    value={this.state.email} />
+                <View style={{ flex: 0.2, flexDirection: 'row', justifyContent: 'space-between' }} >
+                    <TouchableHighlight style={[styles.button, { flex: 1 }]} onPress={() => navigate("EmailSignup")} underlayColor="transparent" activeOpacity={0.5}>
+                        <Text style={styles.smallText}>Don't have an account?</Text>
+                    </TouchableHighlight>
 
-                <TextInput autoCorrect={false} placeholder="Password" style={styles.input}
-                    onChangeText={(text) => this.handleInputPassword(text)}
-                    value={this.state.password}
-                    secureTextEntry={true} />
-
-                <TouchableHighlight style={styles.button} onPress={this.signupEmail} underlayColor="white" activeOpacity={0.5}>
-                    <Text style={styles.instructions}>Sign up</Text>
-                </TouchableHighlight>
-
-                <Text>email is {this.state.email}</Text>
-                <Text>password is {this.state.password}</Text>
-                {errorDisplay}
-
-            </View>
+                    <TouchableHighlight style={[styles.button, { flex: 1 }]} onPress={() => alert('nothing yet')} underlayColor="transparent" activeOpacity={0.5}>
+                        <Text style={styles.smallText}>Forgot password?</Text>
+                    </TouchableHighlight>
+                </View>
+            </Image >
         );
     }
 }
 
 //screen used for signing in
-class EmailSignin extends Component {
+class EmailSignup extends Component {
     constructor(props) {
         super(props);
         this.state = {
             email: '',
             password: '',
-            errorMessage: ''
-        }
-        this.signInEmail = this.signInEmail.bind(this);
+        };
         this.handleInputEmail = this.handleInputEmail.bind(this);
         this.handleInputPassword = this.handleInputPassword.bind(this);
     }
@@ -238,32 +111,9 @@ class EmailSignin extends Component {
         this.setState({ password: text });
     }
 
-    async signInEmail(email, pass) {
-        const { navigate } = this.props.navigation;
-        const authResult = null;
-        try {
-            const authResult = await firebase.auth()
-                .signInWithEmailAndPassword(email, pass);
-            const tokenEmail = await authResult.getIdToken();
-            console.log(tokenEmail);
-            verifyToken(tokenEmail);
-            //go to the signed in screen
-            navigate('SignedIn');
-        } catch (error) {
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            this.setState({ errorMessage: errorMessage });
-            console.log(this.state.errorMessage);
-        }
-    }
-
-
     render() {
         const { navigate } = this.props.navigation;
-        const errorDisplay = this.state.errorMessage !== ''
-            ? <Text style={styles.error}>{this.state.errorMessage}</Text>
-            : null;
-        console.log('error' + errorDisplay);
+        const { email, password } = this.state;
         return (
             <View style={styles.container} >
                 <TextInput autoCorrect={false} placeholder="Email" style={styles.input} keyboardType={'email-address'}
@@ -276,17 +126,17 @@ class EmailSignin extends Component {
                     secureTextEntry={true} />
 
                 <TouchableHighlight style={styles.button}
-                    onPress={() => this.signInEmail(this.state.email, this.state.password)}
+                    onPress={() => authFunctions.signupEmail(email, password)}
                     underlayColor="white" activeOpacity={0.5}>
-                    <Text style={styles.instructions}>Sign in</Text>
+                    <Text style={styles.baseText}>Sign up</Text>
                 </TouchableHighlight>
 
                 <TouchableHighlight style={styles.button}
                     onPress={() => navigate('SigninAndSignup')}
                     underlayColor="white" activeOpacity={0.5}>
-                    <Text style={styles.instructions}>Go back</Text>
+                    <Text style={styles.baseText}>Go back</Text>
                 </TouchableHighlight>
-                {errorDisplay}
+
             </View>
         );
     }
@@ -297,23 +147,8 @@ class SignedIn extends Component {
         super(props);
         this.state = {
             errorMessage: ''
-        }
+        };
         this.signout = this.signout.bind(this);
-    }
-
-    async signout() {
-        const { navigate } = this.props.navigation;
-        try {
-            await firebase.auth().signOut();
-            console.log('User has signed out');
-            // Navigate to welcome screen
-            navigate('SigninAndSignup');
-        } catch (error) {
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            this.setState({ errorMessage: errorMessage });
-            console.log(this.state.errorMessage);
-        }
     }
 
     render() {
@@ -332,21 +167,22 @@ const createNavigationalScreens = (signedIn = false) => {
             screen: SigninAndSignup,
             navigationOptions: {
                 title: "Welcome",
-                headerLeft: null
+                headerLeft: null,
+                header: null
             }
         },
-        EmailSignin: {
-            screen: EmailSignin,
+        EmailSignup: {
+            screen: EmailSignup,
             navigationOptions: {
                 title: "Sign In",
-                headerLeft: null
+                header: null
             }
         },
         SignedIn: {
             screen: SignedIn,
             navigationOptions: {
                 title: 'You are Signed in',
-                headerLeft: null
+                header: null
             }
         }
     },
@@ -358,29 +194,33 @@ const baseFontSize = 16;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        flexDirection: 'column',
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F5FCFF',
     },
-    bold: {
-        fontSize: baseFontSize + 5,
+    baseText: {
         textAlign: 'center',
-        margin: 10,
-    },
-    instructions: {
-        textAlign: 'center',
-        color: '#333333',
-        marginBottom: 5,
+        color: 'white',
         fontSize: baseFontSize
     },
+    smallText: {
+        textAlign: 'center',
+        color: 'white',
+        fontSize: baseFontSize - 4
+    },
     button: {
-        backgroundColor: "#42f4eb",
-        borderRadius: 10,
+        borderRadius: 6,
         margin: 5,
         padding: 5
     },
     input: {
-        width: 200
+        backgroundColor: 'white',
+        width: 250,
+        alignItems: 'center',
+        borderRadius: 4
     },
     error: {
         marginBottom: 5,

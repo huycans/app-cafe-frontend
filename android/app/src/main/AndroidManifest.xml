@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cafeapp"
+    package="com.ebolo.cafeapp"
     android:versionCode="1"
     android:versionName="1.0">
 	
@@ -26,9 +26,8 @@
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
-        android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-        android:windowSoftInputMode="adjustResize"
-		
+		android:configChanges="orientation|screenSize|keyboardHidden"
+		android:windowSoftInputMode="adjustPan"
 		
 		android:launchMode="singleTop">
 		<!--/Added for RNfirebase-->
@@ -54,6 +53,20 @@
 			  <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
 			</intent-filter>
 		</service>
+		<!--Added for fcm -->
+		
+		<service android:name="com.evollu.react.fcm.MessagingService" android:enabled="true" android:exported="true">
+			<intent-filter>
+			<action android:name="com.google.firebase.MESSAGING_EVENT"/>
+			</intent-filter>
+		</service>
+
+		<service android:name="com.evollu.react.fcm.InstanceIdService" android:exported="false">
+			<intent-filter>
+			<action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+			</intent-filter>
+		</service>
+		<!--Added for fcm -->
 		
 		<receiver android:name="io.invertase.firebase.messaging.RNFirebaseLocalMessagingPublisher"/>
 		<receiver android:enabled="true" android:exported="true" android:name="io.invertase.firebase.messaging.RNFirebaseSystemBootEventReceiver">

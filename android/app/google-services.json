@@ -8,12 +8,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:301035346897:android:f34362197719ff70",
+        "mobilesdk_app_id": "1:301035346897:android:9a16669cf6a57eb4",
         "android_client_info": {
-          "package_name": "com.cafeapp"
+          "package_name": "com.ebolo.cafeapp"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "301035346897-lc7turjfmb62t0f0t0f5ko0ptk6541mr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ebolo.cafeapp",
+            "certificate_hash": "418842c3009f34563aa833e8c99293cd8087b2d0"
+          }
+        },
         {
           "client_id": "301035346897-gbeg8ouav7fbpb28c3q3lk34qoskvrno.apps.googleusercontent.com",
           "client_type": 3
