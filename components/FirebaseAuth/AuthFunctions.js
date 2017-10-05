@@ -4,7 +4,7 @@ import { GoogleSignin, GoogleSigninButton } from 'react-native-google-signin';
 
 /**Firebase initilization is done in firebase.js level */
 //import * as firebase from "firebase";
-import firebase from '../firebase/firebase';
+import firebase from './components/FirebaseInit/FirebaseInit.js';
 import { URL } from '../../constants/constants.js';
 
 export default class authFunctions {

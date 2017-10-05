@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import {
     StyleSheet,
@@ -12,7 +11,7 @@ import {
 
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
-import authFunctions from '../signInAndUp/signInAndUp.js';
+import authFunctions from '../FirebaseAuth/FirebaseAuth.js';
 
 //the first screen that welcome the user when they are not signed in
 class SigninAndSignup extends Component {
