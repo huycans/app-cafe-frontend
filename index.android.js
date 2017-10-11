@@ -18,25 +18,33 @@ export default class CafeApp extends Component {
   constructor() {
     super();
     this.state = {
-      isSignedIn: false
+      isSignedIn: false,
+      sessionToken: '',
     };
     this.checkIfSignedIn = this.checkIfSignedIn.bind(this);
+    this.saveSessionToken = this.saveSessionToken.bind(this);
+  }
+
+  saveSessionToken(sToken) {
+    console.log('setting state');
+    this.setState({ sessionToken: sToken });
   }
 
   checkIfSignedIn() {
     console.log("checking authstate");
-    firebase.auth().onAuthStateChanged(function (user) {
-      if (user) {
-        // User is signed in.
-        this.setState({ isSignedIn: true });
-      } else {
-        // User is signed out.
-        this.setState({ isSignedIn: false });
-      }
-    });
+    let user = firebase.auth().currentUser;
+    console.log(user);
+    if (user) {
+      // User is signed in.
+      console.log('User had signed in');
+      this.setState({ isSignedIn: true });
+    } else {
+      // User is signed out.
+      this.setState({ isSignedIn: false });
+    }
   }
 
-  componetDidMount() {
+  componentWillMount() {
     this.checkIfSignedIn();
   }
 
@@ -45,11 +53,10 @@ export default class CafeApp extends Component {
     const Layout = createNavigationalScreens(signedIn);
 
     return (
-      <Layout />
+      <Layout screenProps={{ saveSessionToken: this.saveSessionToken }} />
 
     );
   }
 }
 
-const baseFontSize = 16;
 AppRegistry.registerComponent('CafeApp', () => CafeApp);

@@ -16,19 +16,18 @@
         android:targetSdkVersion="22" />
 
     <application
-      android:name=".MainApplication"
-      android:allowBackup="true"
-      android:label="@string/app_name"
-      android:icon="@mipmap/ic_launcher"
-      android:theme="@style/AppTheme">
-	  <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-	  <!--Added for RNfirebase android:launchMode="singleTop"-->
-      <activity
+		android:name=".MainApplication"
+		android:allowBackup="true"
+		android:label="@string/app_name"
+		android:icon="@mipmap/ic_launcher"
+		android:theme="@style/AppTheme">
+		<meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+		<!--Added for RNfirebase android:launchMode="singleTop"-->
+		<activity
         android:name=".MainActivity"
         android:label="@string/app_name"
 		android:configChanges="orientation|screenSize|keyboardHidden"
 		android:windowSoftInputMode="adjustPan"
-		
 		android:launchMode="singleTop">
 		<!--/Added for RNfirebase-->
 		
@@ -36,10 +35,10 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
-      </activity>
-      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+		</activity>
+		<activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
 	  
-	  <!--Added for RNfirebase -->
+		<!--Added for RNfirebase -->
 	    <service
 		android:name="io.invertase.firebase.messaging.MessagingService"
 		android:enabled="true"
@@ -53,20 +52,7 @@
 			  <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
 			</intent-filter>
 		</service>
-		<!--Added for fcm -->
-		
-		<service android:name="com.evollu.react.fcm.MessagingService" android:enabled="true" android:exported="true">
-			<intent-filter>
-			<action android:name="com.google.firebase.MESSAGING_EVENT"/>
-			</intent-filter>
-		</service>
 
-		<service android:name="com.evollu.react.fcm.InstanceIdService" android:exported="false">
-			<intent-filter>
-			<action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-			</intent-filter>
-		</service>
-		<!--Added for fcm -->
 		
 		<receiver android:name="io.invertase.firebase.messaging.RNFirebaseLocalMessagingPublisher"/>
 		<receiver android:enabled="true" android:exported="true" android:name="io.invertase.firebase.messaging.RNFirebaseSystemBootEventReceiver">

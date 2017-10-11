@@ -7,11 +7,10 @@ import {
     TextInput,
     Button,
     Image,
-    KeyboardAvoidingView,
-
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
-import authFunctions from '../FirebaseAuth/FirebaseAuth.js';
+import {signinFb, verifyToken,setupGoogleSignin,signinGoogle,signupEmail,signinEmail,signout } from '../FirebaseAuth/AuthFunctions.js';
+
 
 //the first screen that welcome the user when they are not signed in
 class SigninAndSignup extends Component {
@@ -27,7 +26,7 @@ class SigninAndSignup extends Component {
     }
 
     componentDidMount() {
-        authFunctions.setupGoogleSignin();
+         setupGoogleSignin();
     }
 
     handleInputEmail(text) {
@@ -38,17 +37,18 @@ class SigninAndSignup extends Component {
         this.setState({ password: text });
     }
 
+    
     render() {
         const { navigate } = this.props.navigation;
+        
         const email = this.state.email;
         const password = this.state.password;
-
+        
         return (
-
             <Image source={require('../../img/vertical-background.png')}
                 style={styles.container} >
                 <View style={{
-                    flex: 1, marginTop: 250, backgroundColor: 'white',
+                    flex: 0.5, marginTop: 250, backgroundColor: 'white',
                     borderRadius: 6, padding: 10, 
                 }}>
                     <TextInput autoCorrect={false} placeholder="Email" style={styles.input} keyboardType={'email-address'}
@@ -61,17 +61,17 @@ class SigninAndSignup extends Component {
                     <TouchableHighlight
                         style={[styles.button,
                         { backgroundColor: "#cccc00", minWidth: 100, marginTop: 15 }]}
-                        onPress={(email, password, navigate) => authFunctions.signinEmail()} underlayColor="transparent" activeOpacity={0.5}>
+                        onPress={() =>  signinEmail(email, password, navigate)} underlayColor="transparent" activeOpacity={0.5}>
                         <Text style={styles.baseText}>Sign in</Text>
                     </TouchableHighlight>
 
                 </View>
 
-                <View style={{ flex: 0.8, flexDirection: 'row', justifyContent: 'space-between', marginTop: 30 }}>
-                    <TouchableHighlight style={styles.button} onPress={(navigate) => authFunctions.signinFb()} underlayColor="transparent" activeOpacity={0.5}>
+                <View style={{ flex: 0.3, flexDirection: 'row', justifyContent: 'space-between', marginTop: 30 }}>
+                    <TouchableHighlight style={styles.button} onPress={() => signinFb(navigate )} underlayColor="transparent" activeOpacity={0.5}>
                         <Image source={require('../../img/facebookLogo.png')} style={{ width: 60, height: 60 }} />
                     </TouchableHighlight>
-                    <TouchableHighlight style={styles.button} onPress={(navigate) => authFunctions.signinGoogle()} underlayColor="transparent" activeOpacity={0.5}>
+                    <TouchableHighlight style={styles.button} onPress={() =>  signinGoogle(navigate)} underlayColor="transparent" activeOpacity={0.5}>
                         <Image source={require('../../img/googleLogo.png')} style={{ width: 60, height: 60 }} />
                     </TouchableHighlight>
                 </View>
@@ -84,6 +84,7 @@ class SigninAndSignup extends Component {
                     <TouchableHighlight style={[styles.button, { flex: 1 }]} onPress={() => alert('nothing yet')} underlayColor="transparent" activeOpacity={0.5}>
                         <Text style={styles.smallText}>Forgot password?</Text>
                     </TouchableHighlight>
+                    
                 </View>
             </Image >
         );
@@ -125,7 +126,7 @@ class EmailSignup extends Component {
                     secureTextEntry={true} />
 
                 <TouchableHighlight style={styles.button}
-                    onPress={() => authFunctions.signupEmail(email, password)}
+                    onPress={() =>  signupEmail(email, password, navigate)}
                     underlayColor="white" activeOpacity={0.5}>
                     <Text style={styles.baseText}>Sign up</Text>
                 </TouchableHighlight>
@@ -144,17 +145,15 @@ class EmailSignup extends Component {
 class SignedIn extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            errorMessage: ''
-        };
-        this.signout = this.signout.bind(this);
+        
     }
-
+    
     render() {
+        const {navigate} = this.props.navigation;
         return (
             <View>
                 <Text>You are Signed in</Text>
-                <Button title="Sign out" onPress={this.signout} />
+                <Button title="Sign out" onPress={() => signout(navigate)} />
             </View>
         );
     }
