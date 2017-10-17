@@ -8,7 +8,7 @@ import {
     Button,
     Image,
 } from 'react-native';
-import { StackNavigator } from 'react-navigation';
+import { StackNavigator, NavigationActions  } from 'react-navigation';
 import { signinFb, verifyToken, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout } from '../FirebaseAuth/AuthFunctions.js';
 
 
@@ -160,7 +160,7 @@ class EmailSignup extends Component {
                         </TouchableHighlight>
 
                         <TouchableHighlight style={[styles.button, { borderRadius: 20, backgroundColor: 'transparent' ,borderWidth: 2 ,borderColor: 'white', borderStyle: 'solid' }]}
-                            onPress={() => navigate('SigninAndSignup')}
+                            onPress={() => this.props.navigation.goBack()}
                             underlayColor="transparent" activeOpacity={0.5}>
                             <Text style={[styles.baseText, { fontSize: baseFontSize + 8, }]}>Go back</Text>
                         </TouchableHighlight>
@@ -176,15 +176,20 @@ class EmailSignup extends Component {
 class SignedIn extends Component {
     constructor(props) {
         super(props);
-
     }
 
     render() {
-        const { navigate } = this.props.navigation;
+        //use signoutAction var to reset(delete) the stack and navigate to SigninAndSignup screen
+        const signoutAction = NavigationActions.reset({
+            index: 0,
+            actions: [
+              NavigationActions.navigate({ routeName: 'SigninAndSignup'})
+            ]
+          });
         return (
             <View>
                 <Text>You are Signed in</Text>
-                <Button title="Sign out" onPress={() => signout(navigate)} />
+                <Button title="Sign out" onPress={() => signout(this.props, signoutAction)} />
             </View>
         );
     }
@@ -215,7 +220,7 @@ const createNavigationalScreens = (signedIn = false) => {
             }
         }
     },
-        { initialRouteName: signedIn ? 'SignedIn' : 'EmailSignup' }
+        { initialRouteName: signedIn ? 'SignedIn' : 'SigninAndSignup' }
     );
 };
 

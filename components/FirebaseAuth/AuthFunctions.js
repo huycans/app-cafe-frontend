@@ -12,13 +12,8 @@ async function getFCMKey() {
     let FCMkey = firebase.messaging().getToken();
     return FCMkey;
 }
-function storeSessionData(serverResponse) {
-    //nothing yet, just output
-    if (serverResponse) {
-        console.log(serverResponse.content.sessionToken);//save in memory, react state not possible. maybe in storage
-        console.log(serverResponse.content.userId);//save in storage
-    }
-}
+
+//verify clientIdToken, FCMkey with server then return server response
 async function verifyToken(clientIdToken, FCMkey) {
     console.log('verifying');
     try {
@@ -47,11 +42,31 @@ async function verifyToken(clientIdToken, FCMkey) {
     }
 }
 
-async function signinFb(navigate) {
-    let clientIdToken = null;
-    let accessToken = null;
-    let currentUser = null;
+//retrieve clientIdToken and FCMkey and send them to server to verify, 
+//then save the neccessary data and userObject to local storage
+async function serverAuth(currentUser) {
+    try {
+        let clientIdToken = await currentUser.getIdToken(true);
 
+        console.log('clientIDToken', clientIdToken);
+
+        //get fcmkey
+        let FCMkey = await getFCMKey();
+        console.log('FCMkey', FCMkey);
+
+        //send clientIdToken, FCMkey to server to receive sessionToken and userId
+        let serverResponse = await verifyToken(clientIdToken, FCMkey);
+
+        //save sessionToken on global, which will disappear when app is destroyed
+        global.sessionToken = serverResponse.content.sessionToken;
+    }
+    catch (error) {
+        alert(error.message);
+        console.log(error);
+    }
+
+}
+async function signinFb(navigate) {
     try {
         let result = await LoginManager.logInWithReadPermissions(['public_profile', 'email']);
 
@@ -61,27 +76,18 @@ async function signinFb(navigate) {
         else {
             console.log(`Login with FB success with permissions: ${result.grantedPermissions.toString()}`);
             // get the access token
-            accessToken = await AccessToken.getCurrentAccessToken();
+            let accessToken = await AccessToken.getCurrentAccessToken();
 
             // create a new firebase credential with the token
             const credential = await firebase.auth.FacebookAuthProvider.credential(accessToken.accessToken);
 
             // login with credential
-            currentUser = await firebase.auth().signInWithCredential(credential);
+            let currentUser = await firebase.auth().signInWithCredential(credential);
 
             // now signed in
             console.log("FBsignin currentUser", currentUser);
-            clientIdToken = await currentUser.getIdToken();
 
-            console.log('clientIDToken', clientIdToken);
-
-            //get fcmkey
-            let FCMkey = await getFCMKey();
-            console.log('FCMkey', FCMkey);
-
-            //send clientIdToken, FCMkey to server to receive sessionToken and userId
-            let serverResponse = await verifyToken(clientIdToken, FCMkey);
-            storeSessionData(serverResponse);
+            serverAuth(currentUser);
 
             navigate('SignedIn');
         }
@@ -126,15 +132,8 @@ async function signinGoogle(navigate) {
         let currentUser = await firebase.auth().signInWithCredential(credential);
         // now signed in
         console.log("googlesignin currentUser", currentUser);
-        let clientIdToken = await currentUser.getIdToken();
-        console.log('clientIDToken', clientIdToken);
-        //get FCM key
-        let FCMkey = await getFCMKey();
-        console.log('FCMkey', FCMkey);
 
-        //send to server
-        let serverResponse = await verifyToken(clientIdToken, FCMkey);
-        storeSessionData(serverResponse);
+        serverAuth(currentUser);
 
         navigate('SignedIn');
     }
@@ -156,15 +155,7 @@ async function signupEmail(email, pass, navigate) {
         let currentUser = firebase.auth().currentUser;
         if (currentUser) {
             // User is signed in
-            let clientIdToken = await currentUser.getIdToken();
-            console.log('clientIDToken', clientIdToken);
-            //get FCM key
-            let FCMkey = await getFCMKey();
-            console.log('FCMkey', FCMkey);
-
-            //send to server
-            let serverResponse = await verifyToken(clientIdToken, FCMkey);
-            storeSessionData(serverResponse);
+            serverAuth(currentUser);
             navigate('SignedIn');
         }
         else {//if not then go to EmailSignup screen
@@ -186,15 +177,8 @@ async function signinEmail(email, pass, navigate) {
     try {
         const currentUser = await firebase.auth().signInWithEmailAndPassword(email, pass);
 
-        let clientIdToken = await currentUser.getIdToken();
-        console.log('clientIDToken', clientIdToken);
-        //get FCM key
-        let FCMkey = await getFCMKey();
-        console.log('FCMkey', FCMkey);
+        serverAuth(currentUser);
 
-        //send to server
-        let serverResponse = await verifyToken(clientIdToken, FCMkey);
-        storeSessionData(serverResponse);
         navigate('SignedIn');
     } catch (error) {
         var errorCode = error.code;
@@ -205,13 +189,13 @@ async function signinEmail(email, pass, navigate) {
     }
 }
 
-async function signout(navigate) {
-
+async function signout(props,signoutAction) {
     try {
         await firebase.auth().signOut();
         console.log('User has signed out');
-        // Navigate to welcome screen
-        navigate('SigninAndSignup');
+        // Navigate to welcome screen using signoutAction
+        props.navigation.dispatch(signoutAction);
+        
     } catch (error) {
         var errorCode = error.code;
         var errorMessage = error.message;
@@ -220,4 +204,4 @@ async function signout(navigate) {
     }
 }
 
-export { signinFb, verifyToken, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout };
+export { serverAuth, signinFb, verifyToken, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout };
