@@ -16,6 +16,29 @@ import {loadData, removeData} from './components/Storage/Storage';
 import {savedName} from './constants/constants';
 //import {Spinner} from 'react-native-loading-spinner-overlay';
 
+type State = {
+  count: number
+};
+
+class MyComponent extends React.Component<void, void, State> {
+  state = {
+    count: 0,
+  };
+
+  componentDidMount() {
+    setInterval(() => {
+      this.setState(prevState => ({
+        count: prevState.count + 1,
+      }));
+    }, 1000);
+  }
+
+  render() {
+    return <div>Count: {this.state.count}</div>;
+  }
+}
+
+<MyComponent />;
 
 type State= {
   isSignedIn: boolean,
@@ -23,10 +46,10 @@ type State= {
 };
 
 export default class CafeApp extends Component<void,void,State> {
-  state:State = {
+  state: State = {
     isSignedIn: null,
     hasLocalCache: false
-  };
+  } ;
   constructor() {
     super();
     //put state outside for flow
@@ -39,7 +62,7 @@ export default class CafeApp extends Component<void,void,State> {
     this.conditionalRender = this.conditionalRender.bind(this);
 
     if (loadData(savedName.userIdFromServer).name ==='NotFoundError' ){
-      this.state.hasLocalCache = true;
+      state.hasLocalCache = true;
     }
     this.checkIfSignedIn();
   }

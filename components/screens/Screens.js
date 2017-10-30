@@ -16,17 +16,21 @@ import {baseFontSize} from '../../constants/constants';
 import SignedInDrawer from './SignedInDrawer';
 //the first screen that welcome the user when they are not signed in
 class SigninAndSignup extends Component {
+    
     constructor(props) {
         super(props);
-        this.state = {
-            email: '',
-            password: '',
-        };
+        // this.state = {
+        //     email: '',
+        //     password: '',
+        // };
 
         this.handleInputEmail = this.handleInputEmail.bind(this);
         this.handleInputPassword = this.handleInputPassword.bind(this);
     }
-
+    state = {
+        email: '',
+        password: '',
+    };
     componentDidMount() {
         setupGoogleSignin();
     }

@@ -10,7 +10,7 @@ import {storeData, removeData} from '../Storage/Storage';
 
 
 const googleWbClientID = '301035346897-gbeg8ouav7fbpb28c3q3lk34qoskvrno.apps.googleusercontent.com';
-async function getFCMKey() {
+async function getFCMKey(): Promise<string> {
     let FCMkey = firebase.messaging().getToken();
     return FCMkey;
 }
@@ -46,7 +46,7 @@ async function verifyToken(clientIdToken: string, FCMkey: string): Promise<any> 
 
 //retrieve clientIdToken and FCMkey and send them to server to verify, 
 //then save the neccessary data to local storage
-async function serverAuth(currentUser: {getIdToken: (boolean) => string}) {
+async function serverAuth(currentUser: {getIdToken: (boolean) => string}): Promise<void> {
     try {
         let clientIdToken = await currentUser.getIdToken(true);
 
@@ -69,7 +69,7 @@ async function serverAuth(currentUser: {getIdToken: (boolean) => string}) {
     }
 
 }
-async function signinFb(navigate: (screenName: string) => mixed) {
+async function signinFb(navigate: (screenName: string) => mixed): Promise<void> {
     try {
         let result = await LoginManager.logInWithReadPermissions(['public_profile', 'email']);
 
@@ -108,7 +108,7 @@ async function signinFb(navigate: (screenName: string) => mixed) {
 
 
 //google signin must be configure before login
-async function setupGoogleSignin() {
+async function setupGoogleSignin(): Promise<void> {
     try {
         await GoogleSignin.hasPlayServices({ autoResolve: true });
         //this method is mandatory
@@ -122,7 +122,7 @@ async function setupGoogleSignin() {
     }
 }
 
-async function signinGoogle(navigate :(screenName: string) => mixed) {
+async function signinGoogle(navigate: (screenName: string) => mixed): Promise<void> {
 
     try {
         //This method give you the current user if already login or null if not yet signin.
@@ -151,7 +151,7 @@ async function signinGoogle(navigate :(screenName: string) => mixed) {
     }
 }
 
-async function signupEmail(email:string, pass:string, navigate:(screenName: string) => mixed) {
+async function signupEmail(email: string, pass: string, navigate: (screenName: string) => mixed): Promise<void> {
 
     try {
         console.log("Signing up email...");
@@ -178,7 +178,7 @@ async function signupEmail(email:string, pass:string, navigate:(screenName: stri
     }
 }
 
-async function signinEmail(email: string, pass: string, navigate:(screenName: string) => mixed) {
+async function signinEmail(email: string, pass: string, navigate: (screenName: string) => mixed): Promise<void> {
     const authResult = null;
     try {
         const currentUser = await firebase.auth().signInWithEmailAndPassword(email, pass);
@@ -195,7 +195,7 @@ async function signinEmail(email: string, pass: string, navigate:(screenName: st
     }
 }
 
-async function signout(props:Object, signoutAction: Object) {
+async function signout(props: Object, signoutAction: Object): Promise<void> {
     try {
         await firebase.auth().signOut();
         console.log('User has signed out');
