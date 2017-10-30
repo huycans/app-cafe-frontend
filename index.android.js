@@ -1,10 +1,8 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
  * @flow
  */
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   AppRegistry,
   StyleSheet,
@@ -12,33 +10,42 @@ import {
 //import * as firebase from "firebase";
 import firebase from './components/FirebaseInit/FirebaseInit';
 import createNavigationalScreens from "./components/Screens/Screens";
-import storage from './components/Storage/Storage';
-import { serverAuth, loadData } from './components/FirebaseAuth/AuthFunctions';
-export default class CafeApp extends Component {
+import { serverAuth } from './components/FirebaseAuth/AuthFunctions';
+import Loading from './components/Loading/Loading';
+import {loadData, removeData} from './components/Storage/Storage';
+import {savedName} from './constants/constants';
+//import {Spinner} from 'react-native-loading-spinner-overlay';
+
+
+type State= {
+  isSignedIn: boolean,
+  hasLocalCache: boolean
+};
+
+export default class CafeApp extends Component<void,void,State> {
+  state:State = {
+    isSignedIn: null,
+    hasLocalCache: false
+  };
   constructor() {
     super();
-    this.state = {
-      isSignedIn: false,
-      //when user signin automatically using onAuthStateChanged without visiting SigninAndUp screen, this is set to true
-      //used for signout function
-      autoSignin : false
-    };
+    //put state outside for flow
+    //  this.state = {
+    //    isSignedIn: null,
+    //    hasLocalCache: false
+    //  };
     this.unsubscribe = null;
     this.checkIfSignedIn = this.checkIfSignedIn.bind(this);
+    this.conditionalRender = this.conditionalRender.bind(this);
+
+    if (loadData(savedName.userIdFromServer).name ==='NotFoundError' ){
+      this.state.hasLocalCache = true;
+    }
+    this.checkIfSignedIn();
   }
 
   checkIfSignedIn() {
     console.log('checkIfSignedIn');
-    // let userObject = await loadData('userObject');
-    // console.log(userObject);
-    // if (userObject){
-    //   serverAuth(userObject);
-    //   this.setState({isSignedIn: true});
-    // }
-    // else {
-    //   this.setState({isSignedIn: false});
-    // }\
-
     //onAuthStateChanged listener will return an unsubscribe function, 
     //Always ensure you unsubscribe from the listener when no longer 
     //needed to prevent updates to components no longer in use
@@ -56,23 +63,33 @@ export default class CafeApp extends Component {
     });
   }
 
-  componentDidMount() {
-    this.checkIfSignedIn();
-  }
+  // componentWillMount() {
+  //   this.checkIfSignedIn();
+  // }
 
   componentWillUnmount() {
     if (this.unsubscribe) {
       this.unsubscribe();
     }
   }
+  conditionalRender(condition, content1, content2) {
+    if (condition) return content1;
+    else return content2;
+  }
 
   render() {
-    const signedIn = this.state.isSignedIn;
-    const Layout = createNavigationalScreens(signedIn);
-
+    let Layout= Loading;
+    const {signedIn, hasLocalCache }= this.state;
+    console.log('signedIn ',signedIn);
+    console.log('hasLocalCache ', hasLocalCache );
+    if (this.state.isSignedIn !== null) {
+       Layout = createNavigationalScreens(hasLocalCache);
+    }
+    
     return (
-      <Layout screenProps={{ autoSignin: this.state.autoSignin }} />
-
+      //signedIn is used in case if the user has outdated local cache 
+      //and authorization with firebase failed than return to signinandup screen
+     <Layout screenProps = {{signedIn: signedIn}}/>
     );
   }
 }

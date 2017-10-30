@@ -1,3 +1,4 @@
+//@flow
 import React, { Component } from 'react';
 import {
     StyleSheet,
@@ -9,9 +10,10 @@ import {
     Image,
 } from 'react-native';
 import { StackNavigator, NavigationActions  } from 'react-navigation';
-import { signinFb, verifyToken, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout } from '../FirebaseAuth/AuthFunctions.js';
-
-
+import { signinFb, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout } from '../FirebaseAuth/AuthFunctions.js';
+import styles from './Styles';
+import {baseFontSize} from '../../constants/constants';
+import SignedInDrawer from './SignedInDrawer';
 //the first screen that welcome the user when they are not signed in
 class SigninAndSignup extends Component {
     constructor(props) {
@@ -43,7 +45,6 @@ class SigninAndSignup extends Component {
 
         const email = this.state.email;
         const password = this.state.password;
-
         return (
             <Image source={require('../../img/vertical-background.png')}
                 style={styles.container} >
@@ -173,29 +174,8 @@ class EmailSignup extends Component {
     }
 }
 
-class SignedIn extends Component {
-    constructor(props) {
-        super(props);
-    }
 
-    render() {
-        //use signoutAction var to reset(delete) the stack and navigate to SigninAndSignup screen
-        const signoutAction = NavigationActions.reset({
-            index: 0,
-            actions: [
-              NavigationActions.navigate({ routeName: 'SigninAndSignup'})
-            ]
-          });
-        return (
-            <View>
-                <Text>You are Signed in</Text>
-                <Button title="Sign out" onPress={() => signout(this.props, signoutAction)} />
-            </View>
-        );
-    }
-}
-
-const createNavigationalScreens = (signedIn = false) => {
+const createNavigationalScreens = (hasLocalCache) => {
     return StackNavigator({
         SigninAndSignup: {
             screen: SigninAndSignup,
@@ -212,60 +192,16 @@ const createNavigationalScreens = (signedIn = false) => {
                 header: null
             }
         },
-        SignedIn: {
-            screen: SignedIn,
+        SignedInDrawer: {
+            screen: SignedInDrawer,
             navigationOptions: {
                 title: 'You are Signed in',
                 header: null
             }
         }
     },
-        { initialRouteName: signedIn ? 'SignedIn' : 'SigninAndSignup' }
+        { initialRouteName: (hasLocalCache) ? 'SignedInDrawer' : 'SigninAndSignup' }
     );
 };
-
-const baseFontSize = 16;
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'column',
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    baseText: {
-        textAlign: 'center',
-        color: 'white',
-        fontSize: baseFontSize
-    },
-    smallText: {
-        textAlign: 'center',
-        color: 'white',
-        fontSize: baseFontSize - 4
-    },
-    button: {
-        borderRadius: 6,
-        margin: 5,
-        padding: 5
-    },
-    input: {
-        width: 250,
-        alignItems: 'center',
-        borderRadius: 4
-    },
-    signupInput: {
-        backgroundColor: 'transparent',
-        textAlign: 'center',
-        color: 'white'
-    },
-    error: {
-        marginBottom: 5,
-        textAlign: 'center',
-        color: 'red',
-        fontSize: baseFontSize + 10,
-    }
-});
 
 export default createNavigationalScreens;
