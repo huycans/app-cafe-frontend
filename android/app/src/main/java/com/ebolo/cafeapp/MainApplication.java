@@ -35,15 +35,6 @@ public class MainApplication extends Application implements ReactApplication {
 		public boolean getUseDeveloperSupport() {
 		  return BuildConfig.DEBUG;
 		}
-
-		/*@Override
-		protected List<ReactPackage> getPackages() {
-		  return Arrays.<ReactPackage>asList(
-			  new MainReactPackage(),
-            new RNGoogleSigninPackage(),
-				new FBSDKPackage()
-		  );
-		}*/
 		
 		@Override
 		protected List<ReactPackage> getPackages() {
@@ -57,21 +48,24 @@ public class MainApplication extends Application implements ReactApplication {
 			  new RNGoogleSigninPackage() // <-- add this for react-native-google-signin
 		  );
 		}
+		
+		@Override
+		protected String getJSMainModuleName() {
+			return "index.android";
+		}
 	};
 
-	  @Override
-	  public ReactNativeHost getReactNativeHost() {
+	@Override
+	public ReactNativeHost getReactNativeHost() {
 		return mReactNativeHost;
-	  }
+	}
 
-	  @Override
-	  public void onCreate() {
+	@Override
+	public void onCreate() {
 		super.onCreate();
 		SoLoader.init(this, /* native exopackage */ false);
 		FacebookSdk.sdkInitialize(getApplicationContext());
-	  // If you want to use AppEventsLogger to log events.
-	  AppEventsLogger.activateApp(this);
-	  }
-	  
-	
+		// If you want to use AppEventsLogger to log events.
+		AppEventsLogger.activateApp(this);
+	}
 }
