@@ -127,7 +127,7 @@ class EmailSignup extends Component {
             if (this.state.password.length > 5){
                 this.setState({validationError: ''});
                 signupEmail(email, password, navigate);
-            }
+            } 
             else{
                 this.setState({validationError: 'Password must be at least 6 characters'});
             }
