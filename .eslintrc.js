@@ -4,16 +4,15 @@ module.exports = {
         "es6": true,
         "node": true
     },
+    "extends": ["eslint:recommended", "plugin:react/recommended"],
     "parser": "babel-eslint",
-    "extends": ["eslint:recommended"],
     "parserOptions": {
         "ecmaVersion": 2017,
         "ecmaFeatures": {
             "experimentalObjectRestSpread": true,
             "jsx": true
         },
-        "sourceType": "module",
-
+        "sourceType": "module"
     },
     "plugins": [
         "react"
@@ -26,6 +25,6 @@ module.exports = {
             "error",
             "always"
         ],
-        "no-unused-vars": ["warn", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }]
+        "no-unused-vars": "warn"
     }
 };
