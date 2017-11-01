@@ -1,20 +1,25 @@
+/**
+ * @flow
+ */
+
 import React, { Component } from 'react';
 import { AccessToken, LoginManager } from 'react-native-fbsdk';
 import { GoogleSignin, GoogleSigninButton } from 'react-native-google-signin';
 
-/**Firebase initilization is done in firebase.js level */
-//import * as firebase from "firebase";
+/**Firebase initilization is done in firebase.js */
 import firebase from '../FirebaseInit/FirebaseInit.js';
-import URL from '../../constants/constants.js';
+import {URL,savedName,timePeriod} from '../../constants/constants.js';
+import {storeData, removeData} from '../Storage/Storage';
+
 
 const googleWbClientID = '301035346897-gbeg8ouav7fbpb28c3q3lk34qoskvrno.apps.googleusercontent.com';
-async function getFCMKey() {
+async function getFCMKey(): Promise<string> {
     let FCMkey = firebase.messaging().getToken();
     return FCMkey;
 }
 
 //verify clientIdToken, FCMkey with server then return server response
-async function verifyToken(clientIdToken, FCMkey) {
+async function verifyToken(clientIdToken: string, FCMkey: string): Promise<any> {
     console.log('verifying');
     try {
         let response = await fetch(URL, {
@@ -43,8 +48,8 @@ async function verifyToken(clientIdToken, FCMkey) {
 }
 
 //retrieve clientIdToken and FCMkey and send them to server to verify, 
-//then save the neccessary data and userObject to local storage
-async function serverAuth(currentUser) {
+//then save the neccessary data to local storage
+async function serverAuth(currentUser: {getIdToken: (boolean) => string}): Promise<void> {
     try {
         let clientIdToken = await currentUser.getIdToken(true);
 
@@ -57,6 +62,7 @@ async function serverAuth(currentUser) {
         //send clientIdToken, FCMkey to server to receive sessionToken and userId
         let serverResponse = await verifyToken(clientIdToken, FCMkey);
 
+        storeData(savedName.userIdFromServer, serverResponse.content.userId, timePeriod.oneMonth);
         //save sessionToken on global, which will disappear when app is destroyed
         global.sessionToken = serverResponse.content.sessionToken;
     }
@@ -66,7 +72,7 @@ async function serverAuth(currentUser) {
     }
 
 }
-async function signinFb(navigate) {
+async function signinFb(navigate: (screenName: string) => mixed): Promise<void> {
     try {
         let result = await LoginManager.logInWithReadPermissions(['public_profile', 'email']);
 
@@ -74,12 +80,15 @@ async function signinFb(navigate) {
             console.log('Login cancelled');
         }
         else {
-            console.log(`Login with FB success with permissions: ${result.grantedPermissions.toString()}`);
+            if (result.grantedPermissions)
+                console.log(`Login with FB success with permissions: ${result.grantedPermissions.toString()}`);
             // get the access token
             let accessToken = await AccessToken.getCurrentAccessToken();
 
             // create a new firebase credential with the token
-            const credential = await firebase.auth.FacebookAuthProvider.credential(accessToken.accessToken);
+            let credential = null;
+            if (accessToken)
+                credential = await firebase.auth.FacebookAuthProvider.credential(accessToken.accessToken);
 
             // login with credential
             let currentUser = await firebase.auth().signInWithCredential(credential);
@@ -89,7 +98,7 @@ async function signinFb(navigate) {
 
             serverAuth(currentUser);
 
-            navigate('SignedIn');
+            navigate('SignedInDrawer');
         }
     }
     catch (error) {
@@ -102,7 +111,7 @@ async function signinFb(navigate) {
 
 
 //google signin must be configure before login
-async function setupGoogleSignin() {
+async function setupGoogleSignin(): Promise<void> {
     try {
         await GoogleSignin.hasPlayServices({ autoResolve: true });
         //this method is mandatory
@@ -116,7 +125,7 @@ async function setupGoogleSignin() {
     }
 }
 
-async function signinGoogle(navigate) {
+async function signinGoogle(navigate: (screenName: string) => mixed): Promise<void> {
 
     try {
         //This method give you the current user if already login or null if not yet signin.
@@ -135,7 +144,7 @@ async function signinGoogle(navigate) {
 
         serverAuth(currentUser);
 
-        navigate('SignedIn');
+        navigate('SignedInDrawer');
     }
     catch (error) {
         var errorCode = error.code;
@@ -145,7 +154,7 @@ async function signinGoogle(navigate) {
     }
 }
 
-async function signupEmail(email, pass, navigate) {
+async function signupEmail(email: string, pass: string, navigate: (screenName: string) => mixed): Promise<void> {
 
     try {
         console.log("Signing up email...");
@@ -156,7 +165,7 @@ async function signupEmail(email, pass, navigate) {
         if (currentUser) {
             // User is signed in
             serverAuth(currentUser);
-            navigate('SignedIn');
+            navigate('SignedInDrawer');
         }
         else {//if not then go to EmailSignup screen
             navigate('EmailSignup');
@@ -172,14 +181,14 @@ async function signupEmail(email, pass, navigate) {
     }
 }
 
-async function signinEmail(email, pass, navigate) {
+async function signinEmail(email: string, pass: string, navigate: (screenName: string) => mixed): Promise<void> {
     const authResult = null;
     try {
         const currentUser = await firebase.auth().signInWithEmailAndPassword(email, pass);
 
         serverAuth(currentUser);
 
-        navigate('SignedIn');
+        navigate('SignedInDrawer');
     } catch (error) {
         var errorCode = error.code;
         var errorMessage = error.message;
@@ -189,10 +198,11 @@ async function signinEmail(email, pass, navigate) {
     }
 }
 
-async function signout(props,signoutAction) {
+async function signout(props: Object, signoutAction: Object): Promise<void> {
     try {
         await firebase.auth().signOut();
         console.log('User has signed out');
+        removeData(savedName.userIdFromServer);
         // Navigate to welcome screen using signoutAction
         props.navigation.dispatch(signoutAction);
         
