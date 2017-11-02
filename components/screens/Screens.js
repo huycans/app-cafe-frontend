@@ -1,15 +1,12 @@
-
 import React, { Component } from 'react';
 import {
-    StyleSheet,
     Text,
     View,
     TouchableHighlight,
     TextInput,
-    Button,
     Image,
 } from 'react-native';
-import { StackNavigator, NavigationActions  } from 'react-navigation';
+import { StackNavigator } from 'react-navigation';
 import { signinFb, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout } from '../FirebaseAuth/AuthFunctions.js';
 import styles from './Styles.js';
 import {baseFontSize} from '../../constants/constants';

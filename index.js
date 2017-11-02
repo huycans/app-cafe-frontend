@@ -15,18 +15,17 @@ import Loading from './components/Loading/Loading';
 import { loadData, removeData } from './components/Storage/Storage';
 import { savedName } from './constants/constants';
 
-type State = {
+type StateType = {
   isSignedIn: boolean,
   hasLocalCache: boolean
 };
 
-export default class CafeApp extends React.Component<void, State> {
+export default class CafeApp extends React.Component<void, StateType> {
   unsubscribe: ?( () => any );
   checkIfSignedIn: () => void;
 
   constructor() {
     super();
-    //put state outside for flow
     this.state = {
       isSignedIn: null,
       hasLocalCache: false

@@ -4,12 +4,12 @@ module.exports = {
       "es6": true,
       "node": true
   },
-  "extends": ["eslint:recommended", "plugin:react/recommended","plugin:flowtype/recommended"],
   "parser": "babel-eslint",
   "plugins": [
     "flowtype",
     "react"
   ],
+  "extends": ["eslint:recommended", "plugin:react/recommended","plugin:flowtype/recommended"],
   "parserOptions": {
       "ecmaVersion": 2017,
       "ecmaFeatures": {
@@ -26,6 +26,8 @@ module.exports = {
           "error",
           "always"
       ],
+      "react/no-unescaped-entities": 0,
+      "react/prop-types": 0,
       "no-unused-vars": "warn",
       "flowtype/boolean-style": [
         2,
@@ -42,7 +44,7 @@ module.exports = {
       ],
       "flowtype/no-primitive-constructor-types": 2,
       "flowtype/no-types-missing-file-annotation": 2,
-      "flowtype/no-weak-types": 2,
+      "flowtype/no-weak-types": 1,
       "flowtype/object-type-delimiter": [
         2,
         "comma"

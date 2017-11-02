@@ -1,10 +1,5 @@
-/**
- * @flow
- */
-
-import React, { Component } from 'react';
 import { AccessToken, LoginManager } from 'react-native-fbsdk';
-import { GoogleSignin, GoogleSigninButton } from 'react-native-google-signin';
+import { GoogleSignin } from 'react-native-google-signin';
 
 /**Firebase initilization is done in firebase.js */
 import firebase from '../FirebaseInit/FirebaseInit.js';
@@ -13,13 +8,13 @@ import {storeData, removeData} from '../Storage/Storage';
 
 
 const googleWbClientID = '301035346897-gbeg8ouav7fbpb28c3q3lk34qoskvrno.apps.googleusercontent.com';
-async function getFCMKey(): Promise<string> {
+async function getFCMKey() {
     let FCMkey = firebase.messaging().getToken();
     return FCMkey;
 }
 
 //verify clientIdToken, FCMkey with server then return server response
-async function verifyToken(clientIdToken: string, FCMkey: string): Promise<any> {
+async function verifyToken(clientIdToken, FCMkey) {
     console.log('verifying');
     try {
         let response = await fetch(URL, {
@@ -49,7 +44,7 @@ async function verifyToken(clientIdToken: string, FCMkey: string): Promise<any> 
 
 //retrieve clientIdToken and FCMkey and send them to server to verify, 
 //then save the neccessary data to local storage
-async function serverAuth(currentUser: {getIdToken: (boolean) => string}): Promise<void> {
+async function serverAuth(currentUser) {
     try {
         let clientIdToken = await currentUser.getIdToken(true);
 
@@ -72,7 +67,7 @@ async function serverAuth(currentUser: {getIdToken: (boolean) => string}): Promi
     }
 
 }
-async function signinFb(navigate: (screenName: string) => mixed): Promise<void> {
+async function signinFb(navigate){
     try {
         let result = await LoginManager.logInWithReadPermissions(['public_profile', 'email']);
 
@@ -98,7 +93,7 @@ async function signinFb(navigate: (screenName: string) => mixed): Promise<void> 
 
             serverAuth(currentUser);
 
-            navigate('SignedInDrawer');
+            navigate("SignedInDrawer");
         }
     }
     catch (error) {
@@ -111,7 +106,7 @@ async function signinFb(navigate: (screenName: string) => mixed): Promise<void> 
 
 
 //google signin must be configure before login
-async function setupGoogleSignin(): Promise<void> {
+async function setupGoogleSignin(){
     try {
         await GoogleSignin.hasPlayServices({ autoResolve: true });
         //this method is mandatory
@@ -125,7 +120,7 @@ async function setupGoogleSignin(): Promise<void> {
     }
 }
 
-async function signinGoogle(navigate: (screenName: string) => mixed): Promise<void> {
+async function signinGoogle(navigate) {
 
     try {
         //This method give you the current user if already login or null if not yet signin.
@@ -154,7 +149,7 @@ async function signinGoogle(navigate: (screenName: string) => mixed): Promise<vo
     }
 }
 
-async function signupEmail(email: string, pass: string, navigate: (screenName: string) => mixed): Promise<void> {
+async function signupEmail(email, pass, navigate){
 
     try {
         console.log("Signing up email...");
@@ -181,8 +176,7 @@ async function signupEmail(email: string, pass: string, navigate: (screenName: s
     }
 }
 
-async function signinEmail(email: string, pass: string, navigate: (screenName: string) => mixed): Promise<void> {
-    const authResult = null;
+async function signinEmail(email, pass, navigate) {
     try {
         const currentUser = await firebase.auth().signInWithEmailAndPassword(email, pass);
 
@@ -198,7 +192,7 @@ async function signinEmail(email: string, pass: string, navigate: (screenName: s
     }
 }
 
-async function signout(props: Object, signoutAction: Object): Promise<void> {
+async function signout(props, signoutAction) {
     try {
         await firebase.auth().signOut();
         console.log('User has signed out');
