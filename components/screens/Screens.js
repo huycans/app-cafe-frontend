@@ -5,15 +5,17 @@ import {
     TouchableHighlight,
     TextInput,
     Image,
+    Animated, 
+    Easing
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import { signinFb, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout } from '../FirebaseAuth/AuthFunctions.js';
 import styles from './Styles.js';
-import {baseFontSize} from '../../constants/constants';
-import SignedInDrawer from './SignedInDrawer';
+import { baseFontSize } from '../../constants/constants';
+import MainDrawerStack from './DrawerStack';
 //the first screen that welcome the user when they are not signed in
 class SigninAndSignup extends Component {
-    
+
     constructor(props) {
         super(props);
         this.state = {
@@ -100,7 +102,7 @@ class EmailSignup extends Component {
         this.state = {
             email: '',
             password: '',
-            validationError:''
+            validationError: ''
         };
         this.handleInputEmail = this.handleInputEmail.bind(this);
         this.handleInputPassword = this.handleInputPassword.bind(this);
@@ -115,28 +117,28 @@ class EmailSignup extends Component {
         this.setState({ password: text });
     }
 
-    validateInput(){
+    validateInput() {
         const { navigate } = this.props.navigation;
         const { email, password } = this.state;
         //use regex to test email input
         var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if (re.test(this.state.email) ) {
-            if (this.state.password.length > 5){
-                this.setState({validationError: ''});
+        if (re.test(this.state.email)) {
+            if (this.state.password.length > 5) {
+                this.setState({ validationError: '' });
                 signupEmail(email, password, navigate);
-            } 
-            else{
-                this.setState({validationError: 'Password must be at least 6 characters'});
+            }
+            else {
+                this.setState({ validationError: 'Password must be at least 6 characters' });
             }
         }
         else {
-            this.setState({validationError: 'Invalid email address'});
+            this.setState({ validationError: 'Invalid email address' });
         }
-        
+
     }
     render() {
         const { navigate } = this.props.navigation;
-        const validationError = <Text style={{textAlign: 'center', color: 'red'}} >{this.state.validationError} </Text>;
+        const validationError = <Text style={{ textAlign: 'center', color: 'red' }} >{this.state.validationError} </Text>;
         return (
             <Image source={require('../../img/signup_bg_vertical.png')}
                 style={styles.container} >
@@ -161,12 +163,12 @@ class EmailSignup extends Component {
                             <Text style={[styles.baseText, { fontSize: baseFontSize + 8 }]}>Sign up</Text>
                         </TouchableHighlight>
 
-                        <TouchableHighlight style={[styles.button, { borderRadius: 20, backgroundColor: 'transparent' ,borderWidth: 2 ,borderColor: 'white', borderStyle: 'solid' }]}
+                        <TouchableHighlight style={[styles.button, { borderRadius: 20, backgroundColor: 'transparent', borderWidth: 2, borderColor: 'white', borderStyle: 'solid' }]}
                             onPress={() => this.props.navigation.goBack()}
                             underlayColor="transparent" activeOpacity={0.5}>
                             <Text style={[styles.baseText, { fontSize: baseFontSize + 8, }]}>Go back</Text>
                         </TouchableHighlight>
-                        
+
                     </View>
                     {validationError}
                 </View>
@@ -175,8 +177,16 @@ class EmailSignup extends Component {
     }
 }
 
+const noTransitionConfig = () => ({
+    transitionSpec: {
+        duration: 0,
+        timing: Animated.timing,
+        easing: Easing.step0
+    }
+});
+
 const createNavigationalScreens = (hasLocalCache) => {
-    return StackNavigator({
+    const PrimaryStack = StackNavigator({
         SigninAndSignup: {
             screen: SigninAndSignup,
             navigationOptions: {
@@ -192,16 +202,21 @@ const createNavigationalScreens = (hasLocalCache) => {
                 header: null
             }
         },
-        SignedInDrawer: {
-            screen: SignedInDrawer,
+        MainDrawerStack: {
+            screen: MainDrawerStack,
             navigationOptions: {
                 title: 'You are Signed in',
                 header: null
             }
         }
     },
-        { initialRouteName: (hasLocalCache) ? 'SignedInDrawer' : 'SigninAndSignup' }
+        //{ initialRouteName: (hasLocalCache) ? 'MainDrawerStack' : 'SigninAndSignup' }
+        {
+            initialRouteName: 'MainDrawerStack',
+            transitionConfig: noTransitionConfig
+        }
     );
+    return PrimaryStack;
 };
 
 export default createNavigationalScreens;
