@@ -8,11 +8,11 @@ import {
     Button,
     Image,
 } from 'react-native';
-import { DrawerNavigator, NavigationActions  } from 'react-navigation';
+import { DrawerNavigator, NavigationActions } from 'react-navigation';
 import { signinFb, verifyToken, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout } from '../FirebaseAuth/AuthFunctions.js';
 
-class Profile extends Component{
-    constructor(props){
+class Profile extends Component {
+    constructor(props) {
         super(props);
     }
     render() {
@@ -20,11 +20,11 @@ class Profile extends Component{
         const signoutAction = NavigationActions.reset({
             index: 0,
             actions: [
-              NavigationActions.navigate({ routeName: 'SigninAndSignup'})
+                NavigationActions.navigate({ routeName: 'SigninAndSignup' })
             ]
-          });
+        });
         //if the user has outdated local cache and authorization with firebase failed than return to signinandup screen
-        if (this.props.screenProps.signedIn === false){
+        if (this.props.screenProps.signedIn === false) {
             this.props.navigation.dispatch(signoutAction);
         }
         return (
@@ -36,54 +36,55 @@ class Profile extends Component{
     }
 }
 
-class Newsfeed extends Component{
-    render(){
-        return(
+class Newsfeed extends Component {
+    render() {
+        return (
             <Text> Newsfeed </Text>
         );
     }
 }
-class Points extends Component{
-    render(){
-        return(
+class Points extends Component {
+    render() {
+        return (
             <Text> Points </Text>
         );
     }
 }
-class Promotion extends Component{
-    render(){
-        return(
+class Promotion extends Component {
+    render() {
+        return (
             <Text> Promotion </Text>
         );
     }
 }
 
-class Settings extends Component{
-    render(){
-        return(
-<Text> Settings </Text>
+class Settings extends Component {
+    render() {
+        return (
+            <Text> Settings </Text>
         );
     }
 }
 
-const  SignedInDrawer = DrawerNavigator({
-    Profile: {
-      screen: Profile,
+const SignedInDrawer =
+    DrawerNavigator({
+        Profile: {
+            screen: Profile,
+        },
+        Newsfeed: {
+            screen: Newsfeed,
+        },
+        Points: {
+            screen: Points,
+        },
+        Promotion: {
+            screen: Promotion,
+        },
+        Settings: {
+            screen: Settings,
+        }
     },
-    Newsfeed: {
-      screen: Newsfeed,
-    },
-    Points: {
-        screen: Points,
-    },
-    Promotion: {
-        screen: Promotion,
-    },
-    Settings: {
-        screen: Settings,
-    }
-  },
-  { initialRouteName: 'Profile' }
-);
+        { initialRouteName: 'Profile' }
+    );
 
 export default SignedInDrawer;

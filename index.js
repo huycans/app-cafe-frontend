@@ -5,23 +5,28 @@
 import * as React from 'react';
 import {
   AppRegistry,
-  StyleSheet,
+  View,
+  Text,
+  Button
 } from 'react-native';
 //import * as firebase from "firebase";
 import firebase from './components/FirebaseInit/FirebaseInit';
-import createNavigationalScreens from "./components/Screens/Screens";
+//import createNavigationalScreens from "./components/Screens/Screens";
 import { serverAuth } from './components/FirebaseAuth/AuthFunctions';
 import Loading from './components/Loading/Loading';
-import { loadData, removeData } from './components/Storage/Storage';
+import { loadData } from './components/Storage/Storage';
 import { savedName } from './constants/constants';
-
+import { StackNavigator, TabNavigator } from 'react-navigation';
 type StateType = {
   isSignedIn: boolean,
   hasLocalCache: boolean
 };
 
+
+
+
 export default class CafeApp extends React.Component<void, StateType> {
-  unsubscribe: ?( () => any );
+  unsubscribe: ?(() => any);
   checkIfSignedIn: () => void;
 
   constructor() {
@@ -33,13 +38,18 @@ export default class CafeApp extends React.Component<void, StateType> {
 
     this.unsubscribe = null;
     this.checkIfSignedIn = this.checkIfSignedIn.bind(this);
+    this.checkLocalCache = this.checkLocalCache.bind(this);
 
-    if (loadData(savedName.userIdFromServer).name === 'NotFoundError') {
-      this.state.hasLocalCache = true;
-    }
     this.checkIfSignedIn();
   }
 
+  async checkLocalCache(): void {
+    let loadResult = await loadData(savedName.userIdFromServer);
+    console.log("loadResult", loadResult);
+    if (loadResult.name !== "NotFoundError") {
+      this.setState({ hasLocalCache: true });
+    }
+  }
   checkIfSignedIn() {
     console.log('checkIfSignedIn');
     //onAuthStateChanged listener will return an unsubscribe function, 
@@ -59,10 +69,6 @@ export default class CafeApp extends React.Component<void, StateType> {
     });
   }
 
-  // componentWillMount() {
-  //   this.checkIfSignedIn();
-  // }
-
   componentWillUnmount() {
     if (this.unsubscribe) {
       this.unsubscribe();
@@ -70,18 +76,24 @@ export default class CafeApp extends React.Component<void, StateType> {
   }
 
   render(): any {
+    this.checkLocalCache();
+    console.log("rendering");
     let Layout = Loading;
     const { isSignedIn, hasLocalCache } = this.state;
     console.log('signedIn ', isSignedIn);
     console.log('hasLocalCache ', hasLocalCache);
-    if (this.state.isSignedIn !== null) {
-      Layout = createNavigationalScreens(hasLocalCache);
-    }
+    // if (this.state.isSignedIn !== null) {
+    //   Layout = createNavigationalScreens(hasLocalCache);
+    // }
+
+
 
     return (
-      //signedIn is used in case if the user has outdated local cache 
+      //isSignedIn is used in case if the user has outdated local cache 
       //and authorization with firebase failed than return to signinandup screen
       <Layout screenProps={{ isSignedIn: isSignedIn }} />
+      
+      //<Text> aaa</Text>
     );
   }
 }

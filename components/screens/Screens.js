@@ -175,7 +175,6 @@ class EmailSignup extends Component {
     }
 }
 
-
 const createNavigationalScreens = (hasLocalCache) => {
     return StackNavigator({
         SigninAndSignup: {

@@ -43,6 +43,7 @@ function storeData(key, data, expires = 1000 * 3600 * 24) {
     }
     catch (error) {
         console.log("Saving error: ", error);
+        throw error;
     }
 }
 function removeData(key) {
@@ -58,7 +59,7 @@ function removeData(key) {
 
 }
 async function loadData(key) {
-    console.log("Loading...");
+    console.log("Loading...", key);
     try {
         let result = await storage.load({
             key: key,
@@ -75,6 +76,7 @@ async function loadData(key) {
     }
     catch (error) {
         console.log("Loading error", error);
+        throw error;
     }
 }
 
