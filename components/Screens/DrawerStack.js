@@ -21,6 +21,7 @@ class Profile extends Component {
         //use signoutAction var to reset(delete) the stack and navigate to SigninAndSignup screen
         const signoutAction = NavigationActions.reset({
             index: 0,
+            key: null,
             actions: [
                 NavigationActions.navigate({ routeName: 'SigninAndSignup' })
             ]

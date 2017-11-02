@@ -89,8 +89,6 @@ export default class CafeApp extends React.Component<void, StateType> {
       //isSignedIn is used in case if the user has outdated local cache 
       //and authorization with firebase failed than return to signinandup screen
       <Layout screenProps={{ isSignedIn: isSignedIn }} />
-
-      //<Text> aaa</Text>
     );
   }
 }

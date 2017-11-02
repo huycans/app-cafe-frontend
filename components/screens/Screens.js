@@ -5,7 +5,7 @@ import {
     TouchableHighlight,
     TextInput,
     Image,
-    Animated, 
+    Animated,
     Easing
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
@@ -210,9 +210,9 @@ const createNavigationalScreens = (hasLocalCache) => {
             }
         }
     },
-        //{ initialRouteName: (hasLocalCache) ? 'MainDrawerStack' : 'SigninAndSignup' }
+
         {
-            initialRouteName: 'MainDrawerStack',
+            initialRouteName: (hasLocalCache) ? 'MainDrawerStack' : 'SigninAndSignup',
             transitionConfig: noTransitionConfig
         }
     );

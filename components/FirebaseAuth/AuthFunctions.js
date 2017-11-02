@@ -93,7 +93,7 @@ async function signinFb(navigate){
 
             serverAuth(currentUser);
 
-            navigate("SignedInDrawer");
+            navigate("MainDrawerStack");
         }
     }
     catch (error) {
@@ -139,7 +139,7 @@ async function signinGoogle(navigate) {
 
         serverAuth(currentUser);
 
-        navigate('SignedInDrawer');
+        navigate('MainDrawerStack');
     }
     catch (error) {
         var errorCode = error.code;
@@ -160,7 +160,7 @@ async function signupEmail(email, pass, navigate){
         if (currentUser) {
             // User is signed in
             serverAuth(currentUser);
-            navigate('SignedInDrawer');
+            navigate('MainDrawerStack');
         }
         else {//if not then go to EmailSignup screen
             navigate('EmailSignup');
@@ -182,7 +182,7 @@ async function signinEmail(email, pass, navigate) {
 
         serverAuth(currentUser);
 
-        navigate('SignedInDrawer');
+        navigate('MainDrawerStack');
     } catch (error) {
         var errorCode = error.code;
         var errorMessage = error.message;
@@ -208,4 +208,28 @@ async function signout(props, signoutAction) {
     }
 }
 
+
+// You can pass down the root navigation object as a prop on your child routes. Instead of using component name in your route config, you can render a component.
+
+// Stack Navigator
+// - Login
+// - Password
+// - Main(Drawer Navigator)
+//    - Profile Screen // signout button
+
+//  Main: {
+//       screen: ({ navigation }) =>
+//         <Main screenProps={{ rootNavigation: navigation }} />,
+//     }
+
+// Account:
+
+// onPress={() => {
+//             props.rootNavigation.dispatch(
+//               NavigationActions.reset({
+//                 index: 0,
+//                 actions: [NavigationActions.navigate({ routeName: 'Login' })]
+//               })
+//             )
+// }}
 export { serverAuth, signinFb, verifyToken, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout };
