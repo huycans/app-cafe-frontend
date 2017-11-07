@@ -13,6 +13,9 @@ import Loading from './components/Loading/Loading';
 import { loadData, removeData } from './components/Storage/Storage';
 import { savedName } from './constants/constants';
 
+import { Navigation } from 'react-native-navigation';
+import { registerScreens } from './components/Screens/Screens';
+
 type StateType = {
   isSignedIn: boolean,
   hasLocalCache: boolean
@@ -88,6 +91,8 @@ export default class CafeApp extends React.Component<void, StateType> {
       Layout = createNavigationalScreens(hasLocalCache: boolean);
     }
 
+    
+    
     return (
       //isSignedIn is used in case if the user has outdated local cache 
       //and authorization with firebase failed than return to signinandup screen
@@ -95,5 +100,21 @@ export default class CafeApp extends React.Component<void, StateType> {
     );
   }
 }
-
-AppRegistry.registerComponent('CafeApp', (): any => CafeApp);
+registerScreens(); // this is where you register all of your app's screens
+Navigation.startTabBasedApp({
+  tabs: [
+    {
+      label: 'One',
+      screen: 'example.FirstTabScreen', // this is a registered name for a screen
+      icon: require('./img/yama.png'),
+      title: 'Screen One'
+    },
+    {
+      label: 'Two',
+      screen: 'example.SecondTabScreen',
+      icon: require('./img/yama.png'),
+      title: 'Screen Two'
+    }
+  ]
+});
+//AppRegistry.registerComponent('CafeApp', (): any => CafeApp);
