@@ -3,10 +3,9 @@ import { GoogleSignin } from 'react-native-google-signin';
 
 /**Firebase initilization is done in firebase.js */
 import firebase from '../FirebaseInit/FirebaseInit.js';
-import {URL,savedName,timePeriod} from '../../constants/constants.js';
-import {storeData, removeData} from '../Storage/Storage';
-
-
+import { URL, savedName, timePeriod } from '../../constants/constants.js';
+import { storeData, removeData } from '../Storage/Storage';
+import { NavigationActions } from 'react-navigation';
 const googleWbClientID = '301035346897-gbeg8ouav7fbpb28c3q3lk34qoskvrno.apps.googleusercontent.com';
 async function getFCMKey() {
     let FCMkey = firebase.messaging().getToken();
@@ -67,7 +66,7 @@ async function serverAuth(currentUser) {
     }
 
 }
-async function signinFb(navigate){
+async function signinFb(navigation) {
     try {
         let result = await LoginManager.logInWithReadPermissions(['public_profile', 'email']);
 
@@ -91,9 +90,15 @@ async function signinFb(navigate){
             // now signed in
             console.log("FBsignin currentUser", currentUser);
 
-            serverAuth(currentUser);
-
-            navigate("MainDrawerStack");
+            await serverAuth(currentUser);
+            console.log('dispatching');
+            const navigationAction = NavigationActions.navigate({
+                routeName: 'MainDrawerStack',
+                params: {},
+                // navigate can have a nested navigate action that will be run inside the child router
+                //action: [NavigationActions.navigate({ routeName: 'EmailSignup'})]
+            });
+            navigation.dispatch(navigationAction);
         }
     }
     catch (error) {
@@ -106,7 +111,7 @@ async function signinFb(navigate){
 
 
 //google signin must be configure before login
-async function setupGoogleSignin(){
+async function setupGoogleSignin() {
     try {
         await GoogleSignin.hasPlayServices({ autoResolve: true });
         //this method is mandatory
@@ -120,7 +125,7 @@ async function setupGoogleSignin(){
     }
 }
 
-async function signinGoogle(navigate) {
+async function signinGoogle(navigation) {
 
     try {
         //This method give you the current user if already login or null if not yet signin.
@@ -139,7 +144,7 @@ async function signinGoogle(navigate) {
 
         serverAuth(currentUser);
 
-        navigate('MainDrawerStack');
+        navigation.navigate('MainDrawerStack');
     }
     catch (error) {
         var errorCode = error.code;
@@ -149,7 +154,7 @@ async function signinGoogle(navigate) {
     }
 }
 
-async function signupEmail(email, pass, navigate){
+async function signupEmail(email, pass, navigation) {
 
     try {
         console.log("Signing up email...");
@@ -160,10 +165,10 @@ async function signupEmail(email, pass, navigate){
         if (currentUser) {
             // User is signed in
             serverAuth(currentUser);
-            navigate('MainDrawerStack');
+            navigation.navigate('MainDrawerStack');
         }
         else {//if not then go to EmailSignup screen
-            navigate('EmailSignup');
+            navigation.navigate('EmailSignup');
         }
 
     } catch (error) {
@@ -176,13 +181,13 @@ async function signupEmail(email, pass, navigate){
     }
 }
 
-async function signinEmail(email, pass, navigate) {
+async function signinEmail(email, pass, navigation) {
     try {
         const currentUser = await firebase.auth().signInWithEmailAndPassword(email, pass);
 
         serverAuth(currentUser);
 
-        navigate('MainDrawerStack');
+        navigation.navigate('MainDrawerStack');
     } catch (error) {
         var errorCode = error.code;
         var errorMessage = error.message;
@@ -199,7 +204,7 @@ async function signout(props, signoutAction) {
         removeData(savedName.userIdFromServer);
         // Navigate to welcome screen using signoutAction
         props.navigation.dispatch(signoutAction);
-        
+
     } catch (error) {
         var errorCode = error.code;
         var errorMessage = error.message;

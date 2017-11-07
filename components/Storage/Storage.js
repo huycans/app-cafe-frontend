@@ -1,6 +1,5 @@
 //https://github.com/sunnylqm/react-native-storage
 
-import React, { Component } from 'react';
 import Storage from 'react-native-storage';
 import { AsyncStorage } from 'react-native';
 

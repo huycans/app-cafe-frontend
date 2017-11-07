@@ -10,7 +10,7 @@ import firebase from './components/FirebaseInit/FirebaseInit';
 import createNavigationalScreens from "./components/Screens/Screens";
 import { serverAuth } from './components/FirebaseAuth/AuthFunctions';
 import Loading from './components/Loading/Loading';
-import { loadData } from './components/Storage/Storage';
+import { loadData, removeData } from './components/Storage/Storage';
 import { savedName } from './constants/constants';
 
 type StateType = {
@@ -32,6 +32,9 @@ export default class CafeApp extends React.Component<void, StateType> {
     this.unsubscribe = null;
     this.checkIfSignedIn = this.checkIfSignedIn.bind(this);
     this.checkLocalCache = this.checkLocalCache.bind(this);
+    removeData(savedName.userIdFromServer);
+    removeData(savedName.userIdFromServer);
+    removeData(savedName.userIdFromServer);
     this.checkLocalCache();
     this.checkIfSignedIn();
   }
@@ -82,7 +85,7 @@ export default class CafeApp extends React.Component<void, StateType> {
     console.log('signedIn ', isSignedIn);
     console.log('hasLocalCache ', hasLocalCache);
     if (this.state.isSignedIn !== null) {
-      Layout = createNavigationalScreens(hasLocalCache);
+      Layout = createNavigationalScreens(hasLocalCache: boolean);
     }
 
     return (

@@ -8,7 +8,7 @@ import {
     Button,
     Image,
 } from 'react-native';
-import { DrawerNavigator, NavigationActions, StackNavigator } from 'react-navigation';
+import { DrawerNavigator, NavigationActions, StackNavigator, TabNavigator } from 'react-navigation';
 import { signinFb, verifyToken, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout } from '../FirebaseAuth/AuthFunctions.js';
 import { removeData } from '../Storage/Storage';
 import { savedName } from '../../constants/constants';
@@ -70,8 +70,7 @@ class Settings extends Component {
     }
 }
 
-const SignedInDrawer =
-    DrawerNavigator({
+const SignedInDrawer = DrawerNavigator({
         Profile: {
             screen: Profile,
             navigationOptions: {

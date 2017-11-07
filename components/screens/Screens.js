@@ -6,13 +6,14 @@ import {
     TextInput,
     Image,
     Animated,
-    Easing
+    Easing,
+    Button
 } from 'react-native';
-import { StackNavigator } from 'react-navigation';
-import { signinFb, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout } from '../FirebaseAuth/AuthFunctions.js';
+import { StackNavigator,NavigationActions } from 'react-navigation';
+import { signinFb, setupGoogleSignin, signinGoogle, signupEmail, signinEmail } from '../FirebaseAuth/AuthFunctions.js';
 import styles from './Styles.js';
 import { baseFontSize } from '../../constants/constants';
-import MainDrawerStack from './DrawerStack';
+import MainDrawerStack from './DrawerStack.js';
 //the first screen that welcome the user when they are not signed in
 class SigninAndSignup extends Component {
 
@@ -26,10 +27,7 @@ class SigninAndSignup extends Component {
         this.handleInputEmail = this.handleInputEmail.bind(this);
         this.handleInputPassword = this.handleInputPassword.bind(this);
     }
-    state = {
-        email: '',
-        password: '',
-    };
+
     componentDidMount() {
         setupGoogleSignin();
     }
@@ -44,7 +42,7 @@ class SigninAndSignup extends Component {
 
 
     render() {
-        const { navigate } = this.props.navigation;
+        const { navigation } = this.props;
 
         const email = this.state.email;
         const password = this.state.password;
@@ -65,23 +63,23 @@ class SigninAndSignup extends Component {
                     <TouchableHighlight
                         style={[styles.button,
                         { backgroundColor: "#cccc00", minWidth: 100, marginTop: 15 }]}
-                        onPress={() => signinEmail(email, password, navigate)} underlayColor="transparent" activeOpacity={0.5}>
+                        onPress={() => signinEmail(email, password, navigation)} underlayColor="transparent" activeOpacity={0.5}>
                         <Text style={styles.baseText}>Sign in</Text>
                     </TouchableHighlight>
 
                 </View>
 
                 <View style={{ flex: 0.3, flexDirection: 'row', justifyContent: 'space-between', marginTop: 30 }}>
-                    <TouchableHighlight style={styles.button} onPress={() => signinFb(navigate)} underlayColor="transparent" activeOpacity={0.5}>
+                    <TouchableHighlight style={styles.button} onPress={() => signinFb(navigation)} underlayColor="transparent" activeOpacity={0.5}>
                         <Image source={require('../../img/facebookLogo.png')} style={{ width: 60, height: 60 }} />
                     </TouchableHighlight>
-                    <TouchableHighlight style={styles.button} onPress={() => signinGoogle(navigate)} underlayColor="transparent" activeOpacity={0.5}>
+                    <TouchableHighlight style={styles.button} onPress={() => signinGoogle(navigation)} underlayColor="transparent" activeOpacity={0.5}>
                         <Image source={require('../../img/googleLogo.png')} style={{ width: 60, height: 60 }} />
                     </TouchableHighlight>
                 </View>
 
                 <View style={{ flex: 0.2, flexDirection: 'row', justifyContent: 'space-between' }} >
-                    <TouchableHighlight style={[styles.button, { flex: 1 }]} onPress={() => navigate("EmailSignup")} underlayColor="transparent" activeOpacity={0.5}>
+                    <TouchableHighlight style={[styles.button, { flex: 1 }]} onPress={() => navigation.navigate("EmailSignup")} underlayColor="transparent" activeOpacity={0.5}>
                         <Text style={styles.smallText}>Don't have an account?</Text>
                     </TouchableHighlight>
 
@@ -118,14 +116,14 @@ class EmailSignup extends Component {
     }
 
     validateInput() {
-        const { navigate } = this.props.navigation;
+        const { navigation } = this.props;
         const { email, password } = this.state;
         //use regex to test email input
         var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (re.test(this.state.email)) {
             if (this.state.password.length > 5) {
                 this.setState({ validationError: '' });
-                signupEmail(email, password, navigate);
+                signupEmail(email, password, navigation);
             }
             else {
                 this.setState({ validationError: 'Password must be at least 6 characters' });
@@ -137,7 +135,7 @@ class EmailSignup extends Component {
 
     }
     render() {
-        const { navigate } = this.props.navigation;
+        const { navigation } = this.props;
         const validationError = <Text style={{ textAlign: 'center', color: 'red' }} >{this.state.validationError} </Text>;
         return (
             <Image source={require('../../img/signup_bg_vertical.png')}
@@ -164,7 +162,7 @@ class EmailSignup extends Component {
                         </TouchableHighlight>
 
                         <TouchableHighlight style={[styles.button, { borderRadius: 20, backgroundColor: 'transparent', borderWidth: 2, borderColor: 'white', borderStyle: 'solid' }]}
-                            onPress={() => this.props.navigation.goBack()}
+                            onPress={() => navigation.goBack()}
                             underlayColor="transparent" activeOpacity={0.5}>
                             <Text style={[styles.baseText, { fontSize: baseFontSize + 8, }]}>Go back</Text>
                         </TouchableHighlight>
