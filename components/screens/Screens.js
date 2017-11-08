@@ -9,14 +9,11 @@ import {
     Easing,
     Button
 } from 'react-native';
-//import { StackNavigator,NavigationActions } from 'react-navigation';
+import { StackNavigator,NavigationActions } from 'react-navigation';
 import { signinFb, setupGoogleSignin, signinGoogle, signupEmail, signinEmail } from '../FirebaseAuth/AuthFunctions.js';
 import styles from './Styles.js';
 import { baseFontSize } from '../../constants/constants';
 import MainDrawerStack from './DrawerStack.js';
-
-import { Navigation } from 'react-native-navigation';
-
 //the first screen that welcome the user when they are not signed in
 class SigninAndSignup extends Component {
 
@@ -53,7 +50,7 @@ class SigninAndSignup extends Component {
             <Image source={require('../../img/vertical-background.png')}
                 style={styles.container} >
                 <View style={{
-                    flex: 0.5, marginTop: "40%", backgroundColor: 'white',
+                    flex: 0.5, marginTop: 250, backgroundColor: 'white',
                     borderRadius: 6, padding: 10,
                 }}>
                     <TextInput autoCorrect={false} placeholder="Email" style={[styles.input, { backgroundColor: "white" }]} keyboardType={'email-address'}
@@ -144,7 +141,7 @@ class EmailSignup extends Component {
             <Image source={require('../../img/signup_bg_vertical.png')}
                 style={styles.container} >
                 <View style={{
-                    flex: 0.6, marginTop: "30%",
+                    flex: 0.6, marginTop: 250,
                     borderRadius: 6, padding: 10,
                 }}>
                     <TextInput autoCorrect={false} placeholder="email@email.com" style={[styles.input, styles.signupInput]} keyboardType={'email-address'}
@@ -178,52 +175,46 @@ class EmailSignup extends Component {
     }
 }
 
-// const noTransitionConfig = () => ({
-//     transitionSpec: {
-//         duration: 0,
-//         timing: Animated.timing,
-//         easing: Easing.step0
-//     }
-// });
+const noTransitionConfig = () => ({
+    transitionSpec: {
+        duration: 0,
+        timing: Animated.timing,
+        easing: Easing.step0
+    }
+});
 
-// const createNavigationalScreens = (hasLocalCache) => {
-//     const PrimaryStack = StackNavigator({
-//         SigninAndSignup: {
-//             screen: SigninAndSignup,
-//             navigationOptions: {
-//                 title: "Welcome",
-//                 headerLeft: null,
-//                 header: null
-//             }
-//         },
-//         EmailSignup: {
-//             screen: EmailSignup,
-//             navigationOptions: {
-//                 title: "Sign In",
-//                 header: null
-//             }
-//         },
-//         MainDrawerStack: {
-//             screen: MainDrawerStack,
-//             navigationOptions: {
-//                 title: 'You are Signed in',
-//                 header: null
-//             }
-//         }
-//     },
+const createNavigationalScreens = (hasLocalCache) => {
+    const PrimaryStack = StackNavigator({
+        SigninAndSignup: {
+            screen: SigninAndSignup,
+            navigationOptions: {
+                title: "Welcome",
+                headerLeft: null,
+                header: null
+            }
+        },
+        EmailSignup: {
+            screen: EmailSignup,
+            navigationOptions: {
+                title: "Sign In",
+                header: null
+            }
+        },
+        MainDrawerStack: {
+            screen: MainDrawerStack,
+            navigationOptions: {
+                title: 'You are Signed in',
+                header: null
+            }
+        }
+    },
 
-//         {
-//             mode: "modal",
-//             initialRouteName: (hasLocalCache) ? 'MainDrawerStack' : 'SigninAndSignup',
-//             transitionConfig: noTransitionConfig
-//         }
-//     );
-//     return PrimaryStack;
-// };
+        {
+            initialRouteName: (hasLocalCache) ? 'MainDrawerStack' : 'SigninAndSignup',
+            transitionConfig: noTransitionConfig
+        }
+    );
+    return PrimaryStack;
+};
 
-
-export function registerScreens() {
-    Navigation.registerComponent('cafeapp.SigninAndSignup', () => SigninAndSignup);
-    Navigation.registerComponent('cafeapp.EmailSignup', () => EmailSignup);
-  }
-//export default createNavigationalScreens;
+export default createNavigationalScreens;
