@@ -99,7 +99,7 @@ android {
 
     defaultConfig {
         applicationId "com.ebolo.cafeapp"
-        minSdkVersion 21
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
