@@ -14,6 +14,7 @@ const timePeriod = {
 
 const savedName = {
     userIdFromServer : 'userIdFromServer',
+    sessionToken: "sessionToken"
 };
 
 const baseFontSize = 16;

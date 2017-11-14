@@ -4,7 +4,8 @@
 
 import * as React from 'react';
 import {
-  AppRegistry
+  AppRegistry,
+  NetInfo
 } from 'react-native';
 import firebase from './components/FirebaseInit/FirebaseInit';
 import createNavigationalScreens from "./components/Screens/Screens";
@@ -15,35 +16,73 @@ import { savedName } from './constants/constants';
 
 type StateType = {
   isSignedIn: boolean,
-  hasLocalCache: boolean
+  hasLocalCache: boolean,
+  isOnline: boolean
 };
 
 export default class CafeApp extends React.Component<void, StateType> {
-  unsubscribe: ?(() => any);
+  unsubscribe: ?(() => {});
   checkIfSignedIn: () => void;
 
   constructor() {
     super();
     this.state = {
       isSignedIn: null,
-      hasLocalCache: false
+      hasLocalCache: false,
+      isOnline: false
     };
-
+    //set up or bind neccessary functions
     this.unsubscribe = null;
-    this.checkIfSignedIn = this.checkIfSignedIn.bind(this);
     this.checkLocalCache = this.checkLocalCache.bind(this);
-    removeData(savedName.userIdFromServer);
-    removeData(savedName.userIdFromServer);
-    removeData(savedName.userIdFromServer);
-    this.checkLocalCache();
-    this.checkIfSignedIn();
+    this.checkNetworkStatus = this.checkNetworkStatus.bind(this);
+  }
+
+  vvcomponentWillMount() {
+    //check for internet connection
+    this.checkNetworkStatus();
+    NetInfo.addEventListener('connectionChange', (connectionInfo: Object) => {
+      if (connectionInfo.type === "none") this.setState.isOnline = false;
+      else this.setState.isOnline = true;
+    });
+
+    if (this.state.isOnline) {
+      //if there is internet connection, check if user is signed in
+      console.log('Check If Signed In');
+      //onAuthStateChanged listener will return an unsubscribe function, 
+      //Always ensure you unsubscribe from the listener when no longer 
+      //needed to prevent updates to components no longer in use
+      this.unsubscribe = firebase.auth().onAuthStateChanged((user: Object) => {
+        if (user) {
+          //user is signed in
+          this.setState.isSignedIn = true;
+          serverAuth(user);
+        }
+        else {
+          //no user is signed in
+          //redundant, only for completion
+          this.setState.isSignedIn = false;
+        }
+      });
+    }
+    else {
+      //if user is offline, check if there is local cache(saved user data on device)
+      //if cache exist, send user to signed in screen
+      this.checkLocalCache();
+    }
+  }
+
+  async checkNetworkStatus(): void {
+    let isConnected = await NetInfo.isConnected.fetch();
+    console.log('Network status is ' + (isConnected ? 'online' : 'offline'));
+    this.state.isOnline = isConnected;
   }
 
   async checkLocalCache(): void {
+    //check local cache
     try {
-      let loadResult = await loadData(savedName.userIdFromServer);
-      console.log("loadResult", loadResult);
-      if (typeof (loadResult) === "string")
+      let loadUserId = await loadData(savedName.userIdFromServer);
+      let loadSessionToken = await loadData(savedName.sessionToken);
+      if (typeof (loadUserId) === "string" && typeof (loadSessionToken) === "string")
         this.setState({ hasLocalCache: true });
     } catch (error) {
       if (error.name === "NotFoundError") {
@@ -52,29 +91,15 @@ export default class CafeApp extends React.Component<void, StateType> {
     }
   }
 
-  checkIfSignedIn() {
-    console.log('checkIfSignedIn');
-    //onAuthStateChanged listener will return an unsubscribe function, 
-    //Always ensure you unsubscribe from the listener when no longer 
-    //needed to prevent updates to components no longer in use
-    this.unsubscribe = firebase.auth().onAuthStateChanged((user: Object) => {
-      if (user) {
-        //user is signed in
-        serverAuth(user);
-        this.setState({ isSignedIn: true });
-      }
-      else {
-        //no user is signed in
-        //redundant, only for completion
-        this.setState({ isSignedIn: false });
-      }
-    });
-  }
 
   componentWillUnmount() {
     if (this.unsubscribe) {
       this.unsubscribe();
     }
+    NetInfo.removeEventListener('connectionChange', (connectionInfo: Object) => {
+      if (connectionInfo === "none") this.setState.isOnline = false;
+      else this.setState.isOnline = true;
+    });
   }
 
   render(): any {
@@ -84,9 +109,9 @@ export default class CafeApp extends React.Component<void, StateType> {
     const { isSignedIn, hasLocalCache } = this.state;
     console.log('signedIn ', isSignedIn);
     console.log('hasLocalCache ', hasLocalCache);
-    if (this.state.isSignedIn !== null) {
-      Layout = createNavigationalScreens(hasLocalCache: boolean);
-    }
+    //if (isSignedIn !== null) {
+      Layout = createNavigationalScreens(true: boolean);
+    //}
 
     return (
       //isSignedIn is used in case if the user has outdated local cache 

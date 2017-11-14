@@ -56,9 +56,13 @@ async function serverAuth(currentUser) {
         //send clientIdToken, FCMkey to server to receive sessionToken and userId
         let serverResponse = await verifyToken(clientIdToken, FCMkey);
 
-        storeData(savedName.userIdFromServer, serverResponse.content.userId, timePeriod.oneMonth);
-        //save sessionToken on global, which will disappear when app is destroyed
-        global.sessionToken = serverResponse.content.sessionToken;
+        if (serverResponse.content){
+            storeData(savedName.userIdFromServer, serverResponse.content.userId, timePeriod.oneMonth);
+            storeData(savedName.sessionToken, serverResponse.content.sessionToken, timePeriod.oneMonth);
+        } 
+        else {
+            throw Error("Veryfing failed: no content exist");
+        }
     }
     catch (error) {
         alert(error.message);
@@ -91,7 +95,6 @@ async function signinFb(navigation) {
             console.log("FBsignin currentUser", currentUser);
 
             await serverAuth(currentUser);
-            console.log('dispatching');
             const navigationAction = NavigationActions.navigate({
                 routeName: 'MainDrawerStack',
                 params: {},
@@ -202,6 +205,7 @@ async function signout(props, signoutAction) {
         await firebase.auth().signOut();
         console.log('User has signed out');
         removeData(savedName.userIdFromServer);
+        removeData(savedName.sessionToken);
         // Navigate to welcome screen using signoutAction
         props.navigation.dispatch(signoutAction);
 

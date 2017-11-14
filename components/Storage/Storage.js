@@ -27,36 +27,6 @@ var storage = new Storage({
         }
 	}
 })	;
-
-function storeData(key, data, expires = 1000 * 3600 * 24) {
-    try {
-        console.log("Saving...", key);
-
-        //persistent storage
-        storage.save({
-            key: key,
-            data: data,
-            expires: expires
-        });
-        console.log("Saved...", key);
-    }
-    catch (error) {
-        console.log("Saving error: ", error);
-        throw error;
-    }
-}
-function removeData(key) {
-    try {
-        storage.remove({
-            key: key
-        });
-        console.log('Removed ', key);
-    }
-    catch (error) {
-        console.log('Removing error ', error);
-    }
-
-}
 async function loadData(key) {
     console.log("Loading...", key);
     try {
@@ -78,5 +48,38 @@ async function loadData(key) {
         throw error;
     }
 }
+
+async function removeData(key) {
+    try {
+        await storage.remove({
+            key: key
+        });
+        console.log('Removed ', key);
+    }
+    catch (error) {
+        console.log('Removing error ', error);
+    }
+
+}
+
+async function storeData(key, data, expires = 1000 * 3600 * 24) {
+    try {
+        console.log("Saving...", key);
+        await removeData(key);
+        //persistent storage
+        await storage.save({
+            key: key,
+            data: data,
+            expires: expires
+        });
+        console.log("Saved...", key);
+    }
+    catch (error) {
+        console.log("Saving error: ", error);
+        throw error;
+    }
+}
+
+
 
 export {storeData, loadData, removeData} ;
