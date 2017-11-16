@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
-import { Image } from 'react-native';
+import { Image, Modal, View, ScrollView, StyleSheet, Linking } from 'react-native';
 import { DrawerNavigator, NavigationActions, StackNavigator } from 'react-navigation';
 import { signinFb, verifyToken, setupGoogleSignin, signinGoogle, signupEmail, signinEmail, signout } from '../FirebaseAuth/AuthFunctions.js';
-import { removeData } from '../Storage/Storage';
-import { savedName } from '../../constants/constants';
 import * as Progress from 'react-native-progress';
-import { Container, Header, Content, Card, CardItem, Body, Text, Button, Footer, Left, Right, Thumbnail, FooterTab } from 'native-base';
+import {
+    Container, Header, Content, Card, CardItem, Body, Text,
+    Button, Footer, Left, Right, Thumbnail, FooterTab, List, ListItem
+} from 'native-base';
+import { URL, SERVER_API, savedName } from "../../constants/constants";
+import Loading from "../Loading/Loading";
+import { storeData } from "../Storage/Storage";
 import * as MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as FontAwesomeIcons from "react-native-vector-icons/FontAwesome";
-import * as MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import * as SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import * as Ionicons from 'react-native-vector-icons/Ionicons';
 const userInfo = {
@@ -32,17 +35,16 @@ class Profile extends Component {
         });
         //if the user has outdated local cache and authorization with firebase failed than return to signinandup screen
         if (this.props.screenProps.signedIn === false) {
-            removeData(savedName.userIdFromServer);
-            this.props.navigation.dispatch(signoutAction);
+            signout(this.props, signoutAction);
         }
         return (
             <Container>
                 <Content>
                     <Card >
                         <CardItem cardBody>
-                            <Image source={require('../../img/background.png')}
+                            <Image source={require('../../img/avatar.jpg')}
                                 style={{ height: 200, width: null, flex: 1, alignItems: "center" }} >
-                                <Thumbnail style={{ marginTop: "5%" }} source={require("../../img/background.png")} large />
+                                <Thumbnail style={{ marginTop: "10%" }} source={require("../../img/avatar.jpg")} large />
                                 <Text style={{ fontSize: 20, marginTop: "auto", textAlign: 'center', color: "white" }} >{userInfo.name}</Text>
                                 <Text note style={[{ color: "white" }]}>{userInfo.memberClass}</Text>
                                 <Text note style={[{ color: "yellow" }]}>{userInfo.points + " điểm"}</Text>
@@ -67,7 +69,7 @@ class Profile extends Component {
                 <Footer >
                     <FooterTab>
                         <Button block onPress={() => signout(this.props, signoutAction)} >
-                            <Ionicons.default name="md-log-out" size={iconSize} color="black"/>
+                            <Ionicons.default name="md-log-out" size={iconSize} color="black" />
                             <Text>Sign out</Text>
                         </Button>
                     </FooterTab>
@@ -78,9 +80,126 @@ class Profile extends Component {
 }
 
 class Newsfeed extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            hasNewsfeed: false,
+            newsfeedData: null,
+            modalVisible: false,
+            selectedPost: null
+        };
+        this.getNewsfeed = this.getNewsfeed.bind(this);
+        this.setModalVisible = this.setModalVisible.bind(this);
+    }
+    async getNewsfeed() {
+        try {
+            console.log("getting newsfeed");
+            let link = URL + SERVER_API.feed;
+            let newsfeed = await fetch(link, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+            });
+            let newsfeedJSON = await newsfeed.json();
+            return newsfeedJSON.content.data;
+        }
+        catch (error) {
+            console.log("Retrieving newsfeed error: ", error);
+        }
+    }
+
+    componentWillMount() {
+        var self = this;//do this so that setstate i callback below can see "this"
+        this.getNewsfeed().then(function (newsfeed) {
+            console.log(newsfeed);
+            //storeData(savedName.newsfeed, newsfeed);
+            self.setState({ newsfeedData: newsfeed });
+            self.setState({ hasNewsfeed: true });
+        },
+            function (error) {
+                console.log(error);
+            }
+        );
+
+    }
+
+    setModalVisible(visible, post) {
+        this.setState({
+            modalVisible: visible,
+            selectedPost: post
+        });
+    }
+
     render() {
+        console.log("Newsfeed rendering");
+        let { hasNewsfeed, newsfeedData, selectedPost } = this.state;
+        let Display = null;
+        if (!hasNewsfeed) {
+            Display = Loading;
+        }
+        else {
+            // let { created_time, full_picture, id, link, message, source } = newsfeedData[0];
+            Display =
+                <List dataArray={newsfeedData.slice(0, 5)}
+                    renderRow={(rowData) => {
+                        // let postDate = new Date(rowData.created_time);
+                        // console.log(postDate);
+                        let messageDigest = rowData.message.slice(0, 100) + " ... ";
+                        return (
+                            <ListItem >
+                                <Card>
+                                    <CardItem>
+                                        <Thumbnail style={{ flex: 1, height: 200 }} source={{ uri: rowData.full_picture }} square large />
+                                    </CardItem>
+                                    <CardItem cardBody button onPress={() => this.setModalVisible(true, rowData)}  >
+                                        <Text style={{ textAlign: "center" }}>
+                                            {messageDigest}
+                                        </Text>
+                                    </CardItem>
+                                    <CardItem footer>
+                                        <Right>
+                                            <Text note style={{ width: 100 }}>
+                                                {rowData.created_time}
+                                            </Text>
+                                        </Right>
+                                    </CardItem>
+                                </Card>
+                            </ListItem>);
+                    }} />;
+        }
+        const ModalCard = (!selectedPost) ? <View /> :
+            //replace card with scrollview
+            <ScrollView contentContainerStyle={modalStyles.contentContainer} >
+                <MaterialIcons.Button name="arrow-back" borderRadius={5}
+                    backgroundColor="transparent" color="black" size={40}
+                    onPress={() => this.setModalVisible(!this.state.modalVisible, this.state.selectedItem)}>
+                    <Text>Go Back</Text>
+                </MaterialIcons.Button>
+
+                <Image style={{ marginTop: 10, height: 200, width: 400, alignSelf: "center" }} source={{ uri: selectedPost.full_picture }} />
+                
+                {/* <Button transparent onPress={() => Linking.openURL(selectedPost.link).catch(err => console.error('An error occurred while open link', err)) }>
+                    <Text style={{fontSize: 12, color: "#4B4B4B"}}>{selectedPost.link}</Text>
+                </Button> */}
+
+                <Text style={{ textAlign: "auto", marginBottom: 15, marginTop: 15 }}>
+                    {selectedPost.message}
+                </Text>
+            </ScrollView>;
         return (
-            <Text> Newsfeed </Text>
+            <Container>
+                <Content>
+                    {Display}
+                    <Modal
+                        animationType="slide"
+                        transparent={false}
+                        visible={this.state.modalVisible}
+                        onRequestClose={() => alert("Modal has been closed.")}
+                    >
+                        {ModalCard}
+                    </Modal>
+                </Content>
+            </Container>
+
         );
     }
 }
@@ -159,7 +278,7 @@ const SignedInDrawer = DrawerNavigator({
         }
     }
 },
-    { initialRouteName: 'Profile' }
+    { initialRouteName: 'Newsfeed' }
 );
 
 
@@ -185,4 +304,10 @@ const MainDrawerStack = StackNavigator({
                 />
         })
     });
+const modalStyles = StyleSheet.create({
+    contentContainer: {
+        paddingLeft: 10,
+        paddingRight: 10
+    }
+});
 export default MainDrawerStack;

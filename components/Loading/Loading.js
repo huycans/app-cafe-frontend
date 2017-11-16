@@ -6,9 +6,9 @@ import {
 
 import React, { Component } from 'react';
 
-const Loading = (isLoading) =>
+const Loading = () =>
     <View style={{ flex: 1, flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator visible={isLoading} textContent={"Loading..."} overlayColor={"white"} color={"black"} textStyle={{ color: "black" }} />
+        <ActivityIndicator visible ={true} textContent={"Loading..."} overlayColor={"white"} color={"black"} textStyle={{ color: "black" }} />
         <Text>Loading...</Text>
     </View>;
 

@@ -65,6 +65,7 @@ async function removeData(key) {
 async function storeData(key, data, expires = 1000 * 3600 * 24) {
     try {
         console.log("Saving...", key);
+        //if data with key already exist, remove it and rewrite
         await removeData(key);
         //persistent storage
         await storage.save({

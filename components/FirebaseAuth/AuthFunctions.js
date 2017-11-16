@@ -3,7 +3,7 @@ import { GoogleSignin } from 'react-native-google-signin';
 
 /**Firebase initilization is done in firebase.js */
 import firebase from '../FirebaseInit/FirebaseInit.js';
-import { URL, savedName, timePeriod } from '../../constants/constants.js';
+import { URL, SERVER_API, savedName, timePeriod } from '../../constants/constants.js';
 import { storeData, removeData } from '../Storage/Storage';
 import { NavigationActions } from 'react-navigation';
 const googleWbClientID = '301035346897-gbeg8ouav7fbpb28c3q3lk34qoskvrno.apps.googleusercontent.com';
@@ -16,7 +16,8 @@ async function getFCMKey() {
 async function verifyToken(clientIdToken, FCMkey) {
     console.log('verifying');
     try {
-        let response = await fetch(URL, {
+        let link = URL + SERVER_API.auth;
+        let response = await fetch(link, {
             method: 'POST',
             headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', },
             body: JSON.stringify({

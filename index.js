@@ -21,9 +21,6 @@ type StateType = {
 };
 
 export default class CafeApp extends React.Component<void, StateType> {
-  unsubscribe: ?(() => {});
-  checkIfSignedIn: () => void;
-
   constructor() {
     super();
     this.state = {
@@ -37,14 +34,16 @@ export default class CafeApp extends React.Component<void, StateType> {
     this.checkNetworkStatus = this.checkNetworkStatus.bind(this);
   }
 
-  vvcomponentWillMount() {
+  componentWillMount() {
     //check for internet connection
-    this.checkNetworkStatus();
     NetInfo.addEventListener('connectionChange', (connectionInfo: Object) => {
       if (connectionInfo.type === "none") this.setState.isOnline = false;
       else this.setState.isOnline = true;
     });
-
+  }
+ componentDidMount(){
+  this.checkNetworkStatus().then(() => {
+    console.log(this.state.isOnline);
     if (this.state.isOnline) {
       //if there is internet connection, check if user is signed in
       console.log('Check If Signed In');
@@ -54,13 +53,13 @@ export default class CafeApp extends React.Component<void, StateType> {
       this.unsubscribe = firebase.auth().onAuthStateChanged((user: Object) => {
         if (user) {
           //user is signed in
-          this.setState.isSignedIn = true;
+          this.setState({isSignedIn : true});
           serverAuth(user);
         }
         else {
           //no user is signed in
           //redundant, only for completion
-          this.setState.isSignedIn = false;
+          this.setState({isSignedIn : false});
         }
       });
     }
@@ -70,11 +69,12 @@ export default class CafeApp extends React.Component<void, StateType> {
       this.checkLocalCache();
     }
   }
-
+  );
+ }
   async checkNetworkStatus(): void {
     let isConnected = await NetInfo.isConnected.fetch();
     console.log('Network status is ' + (isConnected ? 'online' : 'offline'));
-    this.state.isOnline = isConnected;
+    this.setState({ isOnline: isConnected });
   }
 
   async checkLocalCache(): void {
@@ -103,15 +103,14 @@ export default class CafeApp extends React.Component<void, StateType> {
   }
 
   render(): any {
-    //this.checkLocalCache();
     console.log("rendering");
     let Layout = Loading;
     const { isSignedIn, hasLocalCache } = this.state;
     console.log('signedIn ', isSignedIn);
     console.log('hasLocalCache ', hasLocalCache);
-    //if (isSignedIn !== null) {
-      Layout = createNavigationalScreens(true: boolean);
-    //}
+    if (isSignedIn !== null) {
+      Layout = createNavigationalScreens(hasLocalCache: boolean);
+    }
 
     return (
       //isSignedIn is used in case if the user has outdated local cache 
