@@ -47,8 +47,7 @@ export default class SigninAndSignup extends Component<PropType, StateType> {
     render(): void {
         const { navigation } = this.props;
 
-        const email = this.state.email;
-        const password = this.state.password;
+        const {email, password} = this.state;
         return (
             <Image source={require('../../img/vertical-background.png')}
                 style={styles.container} >
@@ -60,7 +59,7 @@ export default class SigninAndSignup extends Component<PropType, StateType> {
                         onChangeText={(text: string): void => this.handleInputEmail(text)}
                         value={this.state.email} />
                     <TextInput autoCorrect={false} placeholder="Password" style={[styles.input, { backgroundColor: "white" }]}
-                        onChangeText={(text: string): void=> this.handleInputPassword(text)}
+                        onChangeText={(text: string): void => this.handleInputPassword(text)}
                         value={this.state.password}
                         secureTextEntry={true} />
                     <TouchableHighlight

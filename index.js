@@ -34,43 +34,53 @@ export default class CafeApp extends React.Component<void, StateType> {
     this.checkNetworkStatus = this.checkNetworkStatus.bind(this);
   }
 
-  componentWillMount() {
+  //remove due to "unmounted" bug with react navigation
+  // componentWillMount() {
+  //   //set up an event listener for network changes
+  //   NetInfo.addEventListener('connectionChange', (connectionInfo: Object) => {
+  //     if (connectionInfo.type === "none") 
+  //       this.setState({ isOnline: false });
+  //     else 
+  //       this.setState({ isOnline: true });
+  //   });
+  // }
+
+  componentDidMount() {
     //check for internet connection
     NetInfo.addEventListener('connectionChange', (connectionInfo: Object) => {
-      if (connectionInfo.type === "none") this.setState.isOnline = false;
-      else this.setState.isOnline = true;
+      if (connectionInfo.type === "none") 
+        this.setState({ isOnline: false });
+      else 
+        this.setState({ isOnline: true });
     });
-  }
- componentDidMount(){
-  this.checkNetworkStatus().then(() => {
-    console.log(this.state.isOnline);
-    if (this.state.isOnline) {
-      //if there is internet connection, check if user is signed in
-      console.log('Check If Signed In');
-      //onAuthStateChanged listener will return an unsubscribe function, 
-      //Always ensure you unsubscribe from the listener when no longer 
-      //needed to prevent updates to components no longer in use
-      this.unsubscribe = firebase.auth().onAuthStateChanged((user: Object) => {
-        if (user) {
-          //user is signed in
-          this.setState({isSignedIn : true});
-          serverAuth(user);
-        }
-        else {
-          //no user is signed in
-          //redundant, only for completion
-          this.setState({isSignedIn : false});
-        }
-      });
+    this.checkNetworkStatus().then(() => {
+      if (this.state.isOnline) {
+        //if there is internet connection, check if user is signed in
+        console.log('Check If Signed In');
+        //onAuthStateChanged listener will return an unsubscribe function, 
+        //Always ensure you unsubscribe from the listener when no longer 
+        //needed to prevent updates to components no longer in use
+        this.unsubscribe = firebase.auth().onAuthStateChanged((user: Object) => {
+          if (user) {
+            //user is signed in
+            this.setState({ isSignedIn: true });
+            serverAuth(user);
+          }
+          else {
+            //no user is signed in
+            //redundant, only for completion
+            this.setState({ isSignedIn: false });
+          }
+        });
+      }
+      else {
+        //if user is offline, check if there is local cache(saved user data on device)
+        //if cache exist, send user to signed in screen
+        this.checkLocalCache();
+      }
     }
-    else {
-      //if user is offline, check if there is local cache(saved user data on device)
-      //if cache exist, send user to signed in screen
-      this.checkLocalCache();
-    }
+    );
   }
-  );
- }
   async checkNetworkStatus(): void {
     let isConnected = await NetInfo.isConnected.fetch();
     console.log('Network status is ' + (isConnected ? 'online' : 'offline'));
@@ -97,8 +107,8 @@ export default class CafeApp extends React.Component<void, StateType> {
       this.unsubscribe();
     }
     NetInfo.removeEventListener('connectionChange', (connectionInfo: Object) => {
-      if (connectionInfo === "none") this.setState.isOnline = false;
-      else this.setState.isOnline = true;
+      if (connectionInfo === "none") this.setState({ isOnline: false });
+      else this.setState({ isOnline: true });
     });
   }
 
