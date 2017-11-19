@@ -2,6 +2,7 @@
 
 import Storage from 'react-native-storage';
 import { AsyncStorage } from 'react-native';
+import { savedName } from '../../constants/constants';
 
 var storage = new Storage({
 	// maximum capacity, default 1000 
@@ -81,6 +82,10 @@ async function storeData(key, data, expires = 1000 * 3600 * 24) {
     }
 }
 
+async function clearAllData(){
+    for (let name in savedName){
+        removeData(name);
+    }
+}
 
-
-export {storeData, loadData, removeData} ;
+export {storeData, loadData, removeData, clearAllData} ;

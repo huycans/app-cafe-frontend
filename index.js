@@ -24,67 +24,109 @@ export default class CafeApp extends React.Component<void, StateType> {
   constructor() {
     super();
     this.state = {
-      isSignedIn: null,
+      isSignedIn: false,
       hasLocalCache: false,
       isOnline: false
     };
     //set up or bind neccessary functions
     this.unsubscribe = null;
+    this.setSignedIn = this.setSignedIn.bind(this);
     this.checkLocalCache = this.checkLocalCache.bind(this);
     this.checkNetworkStatus = this.checkNetworkStatus.bind(this);
+
+    // this.checkNetworkStatus().then((isConnected: boolean) => {
+    //   this.state.isOnline= isConnected;
+    //     //this is a callback, called after this.setState({ isOnline: isConnected }) is done
+    //     if (this.state.isOnline) {
+    //       //if there is internet connection, check if user is signed in
+    //       console.log('Check If Signed In');
+    //       let user = firebase.auth().currentUser;
+    //       if (user) {
+    //         this.setSignedIn(true);
+    //         serverAuth(user);
+    //       }
+    //       else {
+    //         this.setSignedIn(false);
+    //       }
+
+    //     }
+    //     else {
+    //       //if user is offline, check if there is local cache(saved user data on device)
+    //       //if cache exist, send user to signed in screen
+    //       this.checkLocalCache();
+    //     }
+    //   });
   }
 
-  //remove due to "unmounted" bug with react navigation
-  // componentWillMount() {
-  //   //set up an event listener for network changes
-  //   NetInfo.addEventListener('connectionChange', (connectionInfo: Object) => {
-  //     if (connectionInfo.type === "none") 
-  //       this.setState({ isOnline: false });
-  //     else 
-  //       this.setState({ isOnline: true });
-  //   });
-  // }
+  aaaaacomponentWillMount() {
+    //   //set up an event listener for network changes
+    //   NetInfo.addEventListener('connectionChange', (connectionInfo: Object) => {
+    //     if (connectionInfo.type === "none") 
+    //       this.setState({ isOnline: false });
+    //     else 
+    //       this.setState({ isOnline: true });
+    //   });
+    let user = firebase.auth().currentUser;
+    if (user) {
+      this.setSignedIn(true);
+      serverAuth(user);
+    }
+    else {
+      this.setSignedIn(false);
+    }
+  }
 
   componentDidMount() {
     //check for internet connection
-    NetInfo.addEventListener('connectionChange', (connectionInfo: Object) => {
-      if (connectionInfo.type === "none") 
-        this.setState({ isOnline: false });
-      else 
-        this.setState({ isOnline: true });
-    });
-    this.checkNetworkStatus().then(() => {
-      if (this.state.isOnline) {
-        //if there is internet connection, check if user is signed in
-        console.log('Check If Signed In');
-        //onAuthStateChanged listener will return an unsubscribe function, 
-        //Always ensure you unsubscribe from the listener when no longer 
-        //needed to prevent updates to components no longer in use
-        this.unsubscribe = firebase.auth().onAuthStateChanged((user: Object) => {
+    this.checkNetworkStatus().then((isConnected: boolean) => {
+      this.setState({ isOnline: isConnected }, () => {
+        //this is a callback, called after this.setState({ isOnline: isConnected }) is done
+        if (this.state.isOnline) {
+          //if there is internet connection, check if user is signed in
+          console.log('Check If Signed In');
+          //onAuthStateChanged listener will return an unsubscribe function, 
+          //Always ensure you unsubscribe from the listener when no longer 
+          //needed to prevent updates to components no longer in use
+          var user = null;
+          this.unsubscribe = firebase.auth().onAuthStateChanged((currentUser: Object) => {
+            if (user) {
+              //user is signed in
+              user = currentUser;
+              //serverAuth(user);
+              //this.setState({ hasLocalCache: true });
+              //this.setState({ isSignedIn: true });
+            }
+            else {
+              //no user is signed in
+              //redundant, only for completion
+              //this.setState({ isSignedIn: false });
+            }
+          });
           if (user) {
-            //user is signed in
-            this.setState({ isSignedIn: true });
             serverAuth(user);
+            this.setState({ hasLocalCache: true });
+            this.setState({ isSignedIn: true });
           }
-          else {
-            //no user is signed in
-            //redundant, only for completion
-            this.setState({ isSignedIn: false });
-          }
-        });
-      }
-      else {
-        //if user is offline, check if there is local cache(saved user data on device)
-        //if cache exist, send user to signed in screen
-        this.checkLocalCache();
-      }
+          else this.setState({ isSignedIn: false });
+        }
+        else {
+          //if user is offline, check if there is local cache(saved user data on device)
+          //if cache exist, send user to signed in screen
+          this.checkLocalCache();
+        }
+      });
     }
     );
   }
-  async checkNetworkStatus(): void {
+
+  setSignedIn(isSignedIn: boolean) {
+    this.setState({ isSignedIn: isSignedIn });
+  }
+
+  async checkNetworkStatus(): boolean {
     let isConnected = await NetInfo.isConnected.fetch();
     console.log('Network status is ' + (isConnected ? 'online' : 'offline'));
-    this.setState({ isOnline: isConnected });
+    return isConnected;
   }
 
   async checkLocalCache(): void {
@@ -106,10 +148,10 @@ export default class CafeApp extends React.Component<void, StateType> {
     if (this.unsubscribe) {
       this.unsubscribe();
     }
-    NetInfo.removeEventListener('connectionChange', (connectionInfo: Object) => {
-      if (connectionInfo === "none") this.setState({ isOnline: false });
-      else this.setState({ isOnline: true });
-    });
+    // NetInfo.removeEventListener('connectionChange', (connectionInfo: Object) => {
+    //   if (connectionInfo === "none") this.setState({ isOnline: false });
+    //   else this.setState({ isOnline: true });
+    // });
   }
 
   render(): any {

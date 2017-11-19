@@ -16,8 +16,10 @@ const timePeriod = {
 };
 
 const savedName = {
-    userIdFromServer : 'userIdFromServer',
+    userIdFromServer : "userIdFromServer",
+    userKeyFromServer: "userKeyFromServer",
     sessionToken: "sessionToken",
+    FCMkey: "FCMkey",
     newsfeed: "newsfeed"
 };
 

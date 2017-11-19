@@ -4,7 +4,7 @@ import { GoogleSignin } from 'react-native-google-signin';
 /**Firebase initilization is done in firebase.js */
 import firebase from '../FirebaseInit/FirebaseInit.js';
 import { URL, SERVER_API, savedName, timePeriod } from '../../constants/constants.js';
-import { storeData, removeData } from '../Storage/Storage';
+import { storeData, removeData, clearAllData } from '../Storage/Storage';
 import { NavigationActions } from 'react-navigation';
 const googleWbClientID = '301035346897-gbeg8ouav7fbpb28c3q3lk34qoskvrno.apps.googleusercontent.com';
 async function getFCMKey() {
@@ -26,7 +26,6 @@ async function verifyToken(clientIdToken, FCMkey) {
             })
         });
         let responseJSON = await response.json();
-        console.log('server response in json: ', responseJSON);
 
         if (responseJSON.status.httpStatus === 200) {
             //make sure there is content inside the response before return it to signin function
@@ -56,10 +55,12 @@ async function serverAuth(currentUser) {
 
         //send clientIdToken, FCMkey to server to receive sessionToken and userId
         let serverResponse = await verifyToken(clientIdToken, FCMkey);
-
+        console.log("server Response ", serverResponse);
         if (serverResponse.content){
             storeData(savedName.userIdFromServer, serverResponse.content.userId, timePeriod.oneMonth);
-            storeData(savedName.sessionToken, serverResponse.content.sessionToken, timePeriod.oneMonth);
+            storeData(savedName.sessionToken, serverResponse.content.sessionToken, timePeriod.oneDay);
+            storeData(savedName.userKeyFromServer, serverResponse.content.userKey, timePeriod.oneMonth);
+            storeData(savedName.FCMkey, FCMkey, timePeriod.oneDay);
         } 
         else {
             throw Error("Veryfing failed: no content exist");
@@ -96,13 +97,14 @@ async function signinFb(navigation) {
             console.log("FBsignin currentUser", currentUser);
 
             await serverAuth(currentUser);
-            const navigationAction = NavigationActions.navigate({
-                routeName: 'MainDrawerStack',
-                params: {},
-                // navigate can have a nested navigate action that will be run inside the child router
-                //action: [NavigationActions.navigate({ routeName: 'EmailSignup'})]
-            });
-            navigation.dispatch(navigationAction);
+            // const navigationAction = NavigationActions.navigate({
+            //     routeName: 'MainDrawerStack',
+            //     params: {},
+            //     // navigate can have a nested navigate action that will be run inside the child router
+            //     //action: [NavigationActions.navigate({ routeName: 'EmailSignup'})]
+            // });
+            // navigation.dispatch(navigationAction);
+            navigation.navigate('MainDrawerStack');
         }
     }
     catch (error) {
@@ -205,8 +207,7 @@ async function signout(props, signoutAction) {
     try {
         await firebase.auth().signOut();
         console.log('User has signed out');
-        removeData(savedName.userIdFromServer);
-        removeData(savedName.sessionToken);
+        clearAllData();
         // Navigate to welcome screen using signoutAction
         props.navigation.dispatch(signoutAction);
 
