@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest"
+    "test": "jest",
+    "flow start": "flow start",
+    "flow stop": "flow stop",
+    "flow status": "flow status",
+    "flow coverage": "flow coverage"
   },
   "dependencies": {
     "firebase": "^4.3.1",
@@ -22,12 +26,16 @@
     "redux": "^3.7.2"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-eslint": "^8.0.1",
     "babel-jest": "21.0.2",
+    "babel-preset-flow": "^6.23.0",
     "eslint": "^4.10.0",
     "eslint-plugin-flowtype": "^2.39.1",
     "eslint-plugin-react": "^7.4.0",
+    "flow-bin": "0.53.0",
     "jest": "21.1.0",
+    "prettier-eslint": "^8.2.2",
     "react-test-renderer": "16.0.0-alpha.12"
   },
   "jest": {
