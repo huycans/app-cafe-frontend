@@ -8,7 +8,8 @@
     "flow start": "flow start",
     "flow stop": "flow stop",
     "flow status": "flow status",
-    "flow coverage": "flow coverage"
+    "flow coverage": "flow coverage",
+    "lint": "./node_modules/.bin/eslint"
   },
   "dependencies": {
     "firebase": "^4.3.1",

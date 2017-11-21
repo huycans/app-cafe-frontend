@@ -26,7 +26,7 @@ const noTransitionConfig = (): Object => ({
   }
 });
 
-const createNavigationalScreens = (hasLocalCache: boolean): JsxElement => {
+const createNavigationalScreens = (hasLocalCache: boolean): Function => {
   const PrimaryStack = StackNavigator(
     {
       SigninAndSignup: {

@@ -88,9 +88,10 @@ export default class CafeApp extends React.Component<void, StateType> {
     }
   }
 
-  handleNetworkStatusChange(connectionInfo: boolean) {
+  handleNetworkStatusChange(connectionInfo: Object) {
     if (connectionInfo.type === "none") this.setState({ isOnline: false });
     else this.setState({ isOnline: true });
+    console.log("Network status is " + connectionInfo.type);
   }
 
   setSignedIn(isSignedIn: boolean) {

@@ -18,6 +18,11 @@ async function getFCMKey() {
   return FCMkey;
 }
 
+function secureConnect(){
+    console.log('asas');
+    //TODO: encoding process
+}
+
 //verify clientIdToken, FCMkey with server then return server response
 async function verifyToken(clientIdToken, FCMkey) {
   console.log("verifying");

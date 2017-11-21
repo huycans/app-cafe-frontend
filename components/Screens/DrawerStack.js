@@ -5,7 +5,8 @@ import {
   View,
   ScrollView,
   StyleSheet,
-  Linking
+  Linking,
+  Dimensions
 } from "react-native";
 import {
   DrawerNavigator,
@@ -21,7 +22,6 @@ import {
   signinEmail,
   signout
 } from "../FirebaseAuth/AuthFunctions.js";
-import * as Progress from "react-native-progress";
 import {
   Container,
   Header,
@@ -45,135 +45,7 @@ import { storeData } from "../Storage/Storage";
 import * as MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import * as FontAwesomeIcons from "react-native-vector-icons/FontAwesome";
 import * as SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
-import * as Ionicons from "react-native-vector-icons/Ionicons";
-
-const userInfo = {
-  name: "Adam smith",
-  memberClass: "Thành viên mới",
-  points: 60,
-  barcode: {}
-};
-class Profile extends Component {
-  constructor(props) {
-    super(props);
-  }
-  render() {
-    //use signoutAction var to reset(delete) the stack and navigate to SigninAndSignup screen
-    const signoutAction = NavigationActions.reset({
-      index: 0,
-      key: null,
-      actions: [NavigationActions.navigate({ routeName: "SigninAndSignup" })]
-    });
-    //if the user has outdated local cache and authorization with firebase failed than return to signinandup screen
-    if (this.props.screenProps.signedIn === false) {
-      signout(this.props, signoutAction);
-    }
-    return (
-      <Container>
-        <Content>
-          <Card>
-            <CardItem cardBody>
-              <Image
-                source={require("../../img/avatar.jpg")}
-                style={{
-                  height: 200,
-                  width: null,
-                  flex: 1,
-                  alignItems: "center"
-                }}
-              >
-                <Thumbnail
-                  style={{ marginTop: "10%" }}
-                  source={require("../../img/avatar.jpg")}
-                  large
-                />
-                <Text
-                  style={{
-                    fontSize: 20,
-                    marginTop: "auto",
-                    textAlign: "center",
-                    color: "white"
-                  }}
-                >
-                  {userInfo.name}
-                </Text>
-                <Text note style={[{ color: "white" }]}>
-                  {userInfo.memberClass}
-                </Text>
-                <Text note style={[{ color: "yellow" }]}>
-                  {userInfo.points + " điểm"}
-                </Text>
-              </Image>
-            </CardItem>
-            <CardItem style={{ flex: 1 }}>
-              <Progress.Bar
-                style={{ flex: 1 }}
-                width={null}
-                height={6}
-                progress={userInfo.points / 100}
-                color="#FCD836"
-                useNativeDriver={true}
-              />
-            </CardItem>
-            <CardItem style={{ flex: 1 }}>
-              <Body
-                style={{
-                  flex: 1,
-                  flexDirection: "row",
-                  justifyContent: "space-between"
-                }}
-              >
-                <Text
-                  style={[{ fontSize: 10, textAlign: "left", color: "black" }]}
-                >
-                  Thành viên mới
-                </Text>
-                <Text
-                  style={[
-                    { fontSize: 10, textAlign: "center", color: "black" }
-                  ]}
-                >
-                  Buddy
-                </Text>
-                <Text
-                  style={[{ fontSize: 10, textAlign: "right", color: "black" }]}
-                >
-                  You're my angel
-                </Text>
-              </Body>
-            </CardItem>
-          </Card>
-          <Card
-            style={{
-              flex: 1,
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Text style={{ marginTop: 10 }}>Mã tích điểm</Text>
-            <Image
-              style={{ width: 200, height: 80, margin: 20 }}
-              source={require("../../img/barcode.png")}
-            />
-          </Card>
-        </Content>
-        <Footer>
-          <FooterTab>
-            <Button block onPress={() => signout(this.props, signoutAction)}>
-              <Ionicons.default
-                name="md-log-out"
-                size={iconSize}
-                color="black"
-              />
-              <Text>Sign out</Text>
-            </Button>
-          </FooterTab>
-        </Footer>
-      </Container>
-    );
-  }
-}
+import Profile from "./SignedInDrawer/Profile";
 
 class Newsfeed extends Component {
   constructor(props) {
@@ -237,14 +109,25 @@ class Newsfeed extends Component {
       // let { created_time, full_picture, id, link, message, source } = newsfeedData[0];
       Display = (
         <List
-          dataArray={newsfeedData.slice(0, 5)}
+          dataArray={newsfeedData}
           renderRow={rowData => {
             // let postDate = new Date(rowData.created_time);
             // console.log(postDate);
             let messageDigest = rowData.message.slice(0, 100) + " ... ";
             return (
-              <ListItem>
-                <Card>
+              <ListItem
+                button
+                style={{
+                  flex: 1,
+                  backgroundColor: "transparent",
+                  margin: -10
+                }}
+              >
+                <Card
+                  style={{
+                    padding: 0
+                  }}
+                >
                   <CardItem>
                     <Thumbnail
                       style={{ flex: 1, height: 200 }}
@@ -258,11 +141,23 @@ class Newsfeed extends Component {
                     button
                     onPress={() => this.setModalVisible(true, rowData)}
                   >
-                    <Text style={{ textAlign: "center" }}>{messageDigest}</Text>
+                    <Text style={{ textAlign: "left", margin: 10 }}>
+                      {messageDigest}
+                    </Text>
                   </CardItem>
-                  <CardItem footer>
+                  <CardItem
+                    footer
+                    style={{
+                      justifyContent: "flex-end"
+                    }}
+                  >
                     <Right>
-                      <Text note style={{ width: 100 }}>
+                      <Text
+                        note
+                        style={{
+                          fontSize: 10
+                        }}
+                      >
                         {rowData.created_time}
                       </Text>
                     </Right>
@@ -284,7 +179,7 @@ class Newsfeed extends Component {
           borderRadius={5}
           backgroundColor="transparent"
           color="black"
-          size={40}
+          size={30}
           onPress={() =>
             this.setModalVisible(
               !this.state.modalVisible,
@@ -322,7 +217,12 @@ class Newsfeed extends Component {
             animationType="slide"
             transparent={false}
             visible={this.state.modalVisible}
-            onRequestClose={() => alert("Modal has been closed.")}
+            onRequestClose={() =>
+              this.setModalVisible(
+                !this.state.modalVisible,
+                this.state.selectedItem
+              )
+            }
           >
             {ModalCard}
           </Modal>
@@ -331,6 +231,7 @@ class Newsfeed extends Component {
     );
   }
 }
+
 class PointsExchange extends Component {
   render() {
     return <Text> Points </Text>;
