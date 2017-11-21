@@ -206,7 +206,7 @@ class Newsfeed extends Component {
   }
 
   componentDidMount() {
-    var self = this; //do this so that setstate i callback below can see "this"
+    var self = this; //do this so that setstate in callback below can see "this"
     this.getNewsfeed().then(
       function(newsfeed) {
         console.log(newsfeed);
