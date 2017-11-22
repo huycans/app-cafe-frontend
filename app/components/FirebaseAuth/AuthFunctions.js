@@ -18,9 +18,8 @@ async function getFCMKey() {
   return FCMkey;
 }
 
-function secureConnect(){
-    console.log('asas');
-    //TODO: encoding process
+function secureConnect() {
+  //TODO: encoding process using sha512
 }
 
 //verify clientIdToken, FCMkey with server then return server response
@@ -90,7 +89,7 @@ async function serverAuth(currentUser) {
     }
   } catch (error) {
     alert(error.message);
-    console.log(error);
+    console.log("Error while auth with server: ", error);
   }
 }
 async function signinFb(navigation) {
@@ -124,6 +123,7 @@ async function signinFb(navigation) {
       console.log("FBsignin currentUser", currentUser);
 
       await serverAuth(currentUser);
+      //FIXME: typeError map of undefined
       const signinAction = NavigationActions.reset({
         index: 0,
         action: [NavigationActions.navigate({ routeName: "MainDrawerStack" })]

@@ -3,18 +3,19 @@
  */
 
 import * as React from "react";
-import { AppRegistry, NetInfo } from "react-native";
-import firebase from "./components/FirebaseInit/FirebaseInit";
-import createNavigationalScreens from "./components/Screens/Screens";
-import { serverAuth } from "./components/FirebaseAuth/AuthFunctions";
-import Loading from "./components/Loading/Loading";
-import { loadData } from "./components/Storage/Storage";
-import { savedName } from "./constants/constants";
+import { AppRegistry, NetInfo, Text, View } from "react-native";
+import firebase from "./app/components/FirebaseInit/FirebaseInit";
+import createNavigationalScreens from "./app/components/Screens";
+import { serverAuth } from "./app/components/FirebaseAuth/AuthFunctions";
+import Loading from "./app/components/Loading/Loading";
+import { loadData } from "./app/components/Storage/Storage";
+import { savedName } from "./app/constants/constants";
 
 type StateType = {
   isSignedIn: ?boolean,
   hasLocalCache: boolean,
-  isOnline: boolean
+  isOnline: boolean,
+  hasCheckNetworkStatus: boolean
 };
 
 export default class CafeApp extends React.Component<void, StateType> {
@@ -29,7 +30,8 @@ export default class CafeApp extends React.Component<void, StateType> {
     this.state = {
       isSignedIn: null,
       hasLocalCache: false,
-      isOnline: false
+      isOnline: false,
+      hasCheckNetworkStatus: false
     };
     //set up or bind neccessary functions
     //this.unsubscribe = null;
@@ -43,29 +45,33 @@ export default class CafeApp extends React.Component<void, StateType> {
   componentDidMount() {
     //check for internet connection
     this.checkNetworkStatus().then((isConnected: boolean) => {
-      this.setState({ isOnline: isConnected }, () => {
-        //this is a callback, called after this.setState({ isOnline: isConnected }) is done
-        if (this.state.isOnline) {
-          //if there is internet connection, check if user is signed in
-          console.log("Check If Signed In");
-          //onAuthStateChanged listener will return an unsubscribe function,
-          //Always ensure you unsubscribe from the listener when no longer
-          //needed to prevent updates to components no longer in use
-          var user = null;
-          this.unsubscribe = firebase
-            .auth()
-            .onAuthStateChanged((currentUser: Object) => {
-              //set the variable to process outside of this callback in this.handleSignInCheck because
-              //call setstate in here cause problems with react-navigation
-              user = currentUser;
-            });
-          this.handleSignInCheck(user);
-        } else {
-          //if user is offline, check if there is local cache(saved user data on device)
-          //if cache exist, send user to signed in screen
-          this.checkLocalCache();
+      this.setState(
+        { isOnline: isConnected, hasCheckNetworkStatus: true },
+        () => {
+          console.log("inside callback");
+          //this is a callback, called after this.setState({ isOnline: isConnected }) is done
+          if (this.state.isOnline) {
+            //if there is internet connection, check if user is signed in
+            console.log("Check If Signed In");
+            //onAuthStateChanged listener will return an unsubscribe function,
+            //Always ensure you unsubscribe from the listener when no longer
+            //needed to prevent updates to components no longer in use
+            var user = null;
+            this.unsubscribe = firebase
+              .auth()
+              .onAuthStateChanged((currentUser: Object) => {
+                //set the variable to process outside of this callback in this.handleSignInCheck because
+                //call setstate in here cause problems with react-navigation
+                user = currentUser;
+              });
+            this.handleSignInCheck(user);
+          } else {
+            //if user is offline, check if there is local cache(saved user data on device)
+            //if cache exist, send user to signed in screen
+            this.checkLocalCache();
+          }
         }
-      });
+      );
     });
 
     //set up an event listener for network changes
@@ -89,8 +95,11 @@ export default class CafeApp extends React.Component<void, StateType> {
   }
 
   handleNetworkStatusChange(connectionInfo: Object) {
-    if (connectionInfo.type === "none") this.setState({ isOnline: false });
-    else this.setState({ isOnline: true });
+    if (connectionInfo.type === "none") {
+      this.setState({ isOnline: false });
+    } else {
+      this.setState({ isOnline: true });
+    }
     console.log("Network status is " + connectionInfo.type);
   }
 
@@ -134,13 +143,30 @@ export default class CafeApp extends React.Component<void, StateType> {
   render(): any {
     console.log("rendering");
     let Layout = Loading;
-    const { isSignedIn, hasLocalCache } = this.state;
+    const {
+      isSignedIn,
+      hasLocalCache,
+      isOnline,
+      hasCheckNetworkStatus
+    } = this.state;
+    const networkErrorMsg = (
+      <View
+        style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}
+      >
+        <Text style={{ fontSize: 20, textAlign: "center" }}>
+          Connection error: Please check your internet connection
+        </Text>
+      </View>
+    );
     console.log("signedIn ", isSignedIn);
     console.log("hasLocalCache ", hasLocalCache);
+    console.log("isOnline ", isOnline);
+    console.log("hasCheckNetworkStatus ", hasCheckNetworkStatus);
     if (isSignedIn !== null) {
       Layout = createNavigationalScreens(hasLocalCache);
+    } else if (isOnline === false && hasCheckNetworkStatus === true) {
+      Layout = (): React.Component => networkErrorMsg;
     }
-
     return (
       //isSignedIn is used in case if the user has outdated local cache
       //and authorization with firebase failed than return to signinandup screen

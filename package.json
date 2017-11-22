@@ -16,6 +16,7 @@
     "native-base": "^2.3.3",
     "react": "^16.0.0-beta.5",
     "react-native": "^0.49.5",
+    "react-native-extended-stylesheet": "^0.8.0",
     "react-native-fbsdk": "^0.6.1",
     "react-native-firebase": "^2.2.2",
     "react-native-google-signin": "^0.12.0",
@@ -34,7 +35,7 @@
     "eslint": "^4.10.0",
     "eslint-plugin-flowtype": "^2.39.1",
     "eslint-plugin-react": "^7.4.0",
-    "flow-bin": "0.53.0",
+    "flow-bin": "^0.53.0",
     "jest": "21.1.0",
     "prettier-eslint": "^8.2.2",
     "react-test-renderer": "16.0.0-alpha.12"

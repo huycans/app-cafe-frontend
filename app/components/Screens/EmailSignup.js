@@ -6,7 +6,7 @@ import styles from "./Styles.js";
 import { baseFontSize } from "../../constants/constants";
 
 type PropType = {
-  navigation: () => {}
+  navigation: Function
 };
 type StateType = {
   email: string,

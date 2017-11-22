@@ -26,8 +26,8 @@ const noTransitionConfig = (): Object => ({
   }
 });
 
-const createNavigationalScreens = (hasLocalCache: boolean): Function => {
-  const PrimaryStack = StackNavigator(
+const createNavigationalScreens = (hasLocalCache: boolean): Function =>
+  StackNavigator(
     {
       SigninAndSignup: {
         screen: SigninAndSignup,
@@ -40,7 +40,7 @@ const createNavigationalScreens = (hasLocalCache: boolean): Function => {
       EmailSignup: {
         screen: EmailSignup,
         navigationOptions: {
-          title: "Sign In",
+          title: "Email Signup",
           header: null
         }
       },
@@ -58,7 +58,5 @@ const createNavigationalScreens = (hasLocalCache: boolean): Function => {
       transitionConfig: noTransitionConfig
     }
   );
-  return PrimaryStack;
-};
 
 export default createNavigationalScreens;
