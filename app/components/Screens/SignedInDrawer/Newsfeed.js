@@ -1,13 +1,5 @@
 import React, { Component } from "react";
-import {
-  Image,
-  Modal,
-  View,
-  ScrollView,
-  StyleSheet,
-  Linking,
-  Dimensions
-} from "react-native";
+import { Image, Modal, View, ScrollView, StyleSheet } from "react-native";
 import {
   Container,
   Content,
@@ -19,7 +11,7 @@ import {
   List,
   ListItem
 } from "native-base";
-import { URL, SERVER_API, savedName } from "../../../constants/constants";
+import { URL, SERVER_API } from "../../../constants/constants";
 
 import Loading from "../../Loading/Loading";
 import * as MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -78,7 +70,6 @@ export default class Newsfeed extends Component {
 
   render() {
     console.log("Newsfeed rendering");
-    console.log("Slected post", this.state.selectedPost);
     let { hasNewsfeed, newsfeedData, selectedPost } = this.state;
     let Display = null;
     if (!hasNewsfeed) {
@@ -96,15 +87,15 @@ export default class Newsfeed extends Component {
               <ListItem
                 button
                 style={{
-                  flex: 1,
-                  marginLeft: 0
+                  width: "100%",
+                  marginLeft: 0,
+                  paddingLeft: 0,
+                  paddingRight: 0,
+                  marginRight: 0
+                  //backgroundColor: "transparent"
                 }}
               >
-                <Card
-                  style={{
-                    paddingLeft: 30
-                  }}
-                >
+                <Card>
                   <CardItem>
                     <Thumbnail
                       style={{ flex: 1, height: 200 }}
@@ -177,10 +168,6 @@ export default class Newsfeed extends Component {
             }}
             source={{ uri: selectedPost.full_picture }}
           />
-
-          {/* <Button transparent onPress={() => Linking.openURL(selectedPost.link).catch(err => console.error('An error occurred while open link', err)) }>
-                      <Text style={{fontSize: 12, color: "#4B4B4B"}}>{selectedPost.link}</Text>
-                  </Button> */}
 
           <Text style={{ textAlign: "auto", marginBottom: 15, marginTop: 15 }}>
             {selectedPost.message}

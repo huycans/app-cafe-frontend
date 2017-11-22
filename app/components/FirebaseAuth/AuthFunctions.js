@@ -9,17 +9,39 @@ import {
   savedName,
   timePeriod
 } from "../../constants/constants.js";
-import { storeData, removeData, clearAllData } from "../Storage/Storage";
+import {
+  storeData,
+  removeData,
+  clearAllData,
+  loadData
+} from "../Storage/Storage";
 import { NavigationActions } from "react-navigation";
+import sha512 from "crypto-js/sha512";
 const googleWbClientID =
   "301035346897-gbeg8ouav7fbpb28c3q3lk34qoskvrno.apps.googleusercontent.com";
+
 async function getFCMKey() {
   let FCMkey = firebase.messaging().getToken();
   return FCMkey;
 }
 
-function secureConnect() {
-  //TODO: encoding process using sha512
+async function secureConnect(method, api) {
+  let sessionToken = await loadData(savedName.sessionToken);
+  let fcmkey = await loadData(savedName.FCMkey);
+  let link = URL + api;
+  let currentTime = new Date();
+  let stringToEncode = method + link + currentTime.toISOString() + fcmkey;
+  let hashDigest = toString(sha512(stringToEncode));
+  let serverResponse = await fetch(link, {
+    method: method,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      sessionToken: sessionToken,
+      enc: hashDigest
+    }
+  });
+  return serverResponse.json();
 }
 
 const signinAction = NavigationActions.reset({
