@@ -22,6 +22,11 @@ function secureConnect() {
   //TODO: encoding process using sha512
 }
 
+const signinAction = NavigationActions.reset({
+  index: 0,
+  actions: [NavigationActions.navigate({ routeName: "MainDrawerStack" })]
+});
+
 //verify clientIdToken, FCMkey with server then return server response
 async function verifyToken(clientIdToken, FCMkey) {
   console.log("verifying");
@@ -123,11 +128,7 @@ async function signinFb(navigation) {
       console.log("FBsignin currentUser", currentUser);
 
       await serverAuth(currentUser);
-      //FIXME: typeError map of undefined
-      const signinAction = NavigationActions.reset({
-        index: 0,
-        action: [NavigationActions.navigate({ routeName: "MainDrawerStack" })]
-      });
+
       navigation.dispatch(signinAction);
       //navigation.navigate('MainDrawerStack');
     }
@@ -171,10 +172,7 @@ async function signinGoogle(navigation) {
     console.log("googlesignin currentUser", currentUser);
 
     await serverAuth(currentUser);
-    const signinAction = NavigationActions.reset({
-      index: 0,
-      action: [NavigationActions.navigate({ routeName: "MainDrawerStack" })]
-    });
+
     navigation.dispatch(signinAction);
   } catch (error) {
     var errorCode = error.code;
@@ -193,10 +191,7 @@ async function signupEmail(email, pass, navigation) {
     if (currentUser) {
       // User is signed in
       await serverAuth(currentUser);
-      const signinAction = NavigationActions.reset({
-        index: 0,
-        action: [NavigationActions.navigate({ routeName: "MainDrawerStack" })]
-      });
+
       navigation.dispatch(signinAction);
     } else {
       //if not then go to EmailSignup screen
@@ -219,10 +214,7 @@ async function signinEmail(email, pass, navigation) {
       .signInWithEmailAndPassword(email, pass);
 
     await serverAuth(currentUser);
-    const signinAction = NavigationActions.reset({
-      index: 0,
-      action: [NavigationActions.navigate({ routeName: "MainDrawerStack" })]
-    });
+
     navigation.dispatch(signinAction);
   } catch (error) {
     var errorCode = error.code;

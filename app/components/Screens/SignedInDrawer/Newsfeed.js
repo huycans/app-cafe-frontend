@@ -78,13 +78,14 @@ export default class Newsfeed extends Component {
 
   render() {
     console.log("Newsfeed rendering");
+    console.log("Slected post", this.state.selectedPost);
     let { hasNewsfeed, newsfeedData, selectedPost } = this.state;
     let Display = null;
     if (!hasNewsfeed) {
       Display = Loading;
     } else {
       // let { created_time, full_picture, id, link, message, source } = newsfeedData[0];
-      Display = (
+      Display = () => (
         <List
           dataArray={newsfeedData}
           renderRow={rowData => {
@@ -96,13 +97,12 @@ export default class Newsfeed extends Component {
                 button
                 style={{
                   flex: 1,
-                  backgroundColor: "transparent"
-                  //margin: -10
+                  marginLeft: 0
                 }}
               >
                 <Card
                   style={{
-                    padding: 0
+                    paddingLeft: 30
                   }}
                 >
                   <CardItem>
@@ -146,12 +146,12 @@ export default class Newsfeed extends Component {
         />
       );
     }
-    const ModalCard = () =>
-      !selectedPost ? (
+    const ModalCard = props =>
+      !props.selectedPost ? (
         <View />
       ) : (
         //replace card with scrollview
-        <ScrollView>
+        <ScrollView style={modalStyles.contentContainer}>
           <MaterialIcons.Button
             name="arrow-back"
             borderRadius={5}
@@ -161,7 +161,7 @@ export default class Newsfeed extends Component {
             onPress={() =>
               this.setModalVisible(
                 !this.state.modalVisible,
-                this.state.selectedItem
+                this.state.selectedPost
               )
             }
           >
@@ -190,7 +190,7 @@ export default class Newsfeed extends Component {
     return (
       <Container>
         <Content>
-          {Display}
+          <Display />
           <Modal
             animationType="slide"
             transparent={false}
@@ -198,11 +198,11 @@ export default class Newsfeed extends Component {
             onRequestClose={() =>
               this.setModalVisible(
                 !this.state.modalVisible,
-                this.state.selectedItem
+                this.state.selectedPost
               )
             }
           >
-            {ModalCard}
+            <ModalCard selectedPost={selectedPost} />
           </Modal>
         </Content>
       </Container>

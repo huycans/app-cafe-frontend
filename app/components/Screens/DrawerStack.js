@@ -64,7 +64,7 @@ const SignedInDrawer = DrawerNavigator(
       }
     }
   },
-  { initialRouteName: "Profile" }
+  { initialRouteName: "Newsfeed" }
 );
 
 //the drawers are inside of another stack
