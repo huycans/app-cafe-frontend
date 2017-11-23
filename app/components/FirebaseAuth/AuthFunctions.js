@@ -4,20 +4,10 @@ import { GoogleSignin } from "react-native-google-signin";
 
 /**Firebase initilization is done in firebase.js */
 import firebase from "../FirebaseInit/FirebaseInit.js";
-import {
-  URL,
-  SERVER_API,
-  savedName,
-  timePeriod
-} from "../../constants/constants.js";
-import {
-  storeData,
-  removeData,
-  clearAllData,
-  loadData
-} from "../Storage/Storage";
+import { savedName } from "../../constants/constants.js";
+import { storeData, clearAllData } from "../Storage/Storage";
 import { NavigationActions } from "react-navigation";
-import sha512 from "crypto-js/sha512";
+import { getUserData, secureConnect, verifyToken } from "../ServerCommsFuncs";
 const googleWbClientID =
   "301035346897-gbeg8ouav7fbpb28c3q3lk34qoskvrno.apps.googleusercontent.com";
 
@@ -26,105 +16,10 @@ async function getFCMKey(): Promise<string> {
   return FCMkey;
 }
 
-async function secureConnect(
-  method: string,
-  api: string,
-  userId: string,
-  sessionToken: string,
-  fcmKey: string
-): Promise<any> {
-  try {
-    console.log("starting getting user data");
-    let currentTime = new Date().toISOString();
-    //Hashing.sha512().hashString("GET /user/info/$userId $currentTime $fcmKey", Charsets.UTF_8).toString()
-    let hashDigest = sha512(
-      `${method} ${api}/${userId} ${currentTime} ${fcmKey}`
-    ).toString();
-    console.log("hash digest: ", hashDigest);
-    let link = `${URL}${api}/${userId}?emit=${currentTime}`;
-    let serverResponse = await fetch(link, {
-      method: method,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        sessionToken: sessionToken,
-        enc: hashDigest
-      }
-    });
-    console.log("secure connect serverResponse: ", serverResponse);
-    let responseJSON = await serverResponse.json();
-    console.log("secure connect responseJSON: ", responseJSON);
-    if (responseJSON.status.httpStatus === 200) {
-      //make sure there is content inside the response before return it to signin function
-      return responseJSON;
-    } else {
-      console.log(responseJSON.message);
-      throw responseJSON.message;
-    }
-  } catch (error) {
-    console.log("Error when securely connect to server: ", error);
-  }
-}
-
-async function getUserData(
-  userId: string,
-  sessionToken: string,
-  fcmKey: string
-): Promise<void> {
-  try {
-    console.log("getting user data");
-    //let userId = await loadData(savedName.userIdFromServer);
-    let userData = await secureConnect(
-      "GET",
-      SERVER_API.userinfo,
-      userId,
-      sessionToken,
-      fcmKey
-    );
-    return userData;
-    //TODO: store data
-  } catch (error) {
-    console.log("get user data error: ", error);
-  }
-}
-
 const signinAction = NavigationActions.reset({
   index: 0,
   actions: [NavigationActions.navigate({ routeName: "MainDrawerStack" })]
 });
-
-//verify clientIdToken, FCMkey with server then return server response
-async function verifyToken(
-  clientIdToken: string,
-  FCMkey: string
-): Promise<any> {
-  console.log("verifying");
-  try {
-    let link = URL + SERVER_API.auth;
-    let response = await fetch(link, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        clientIdToken: clientIdToken,
-        fcmKey: FCMkey
-      })
-    });
-    let responseJSON = await response.json();
-
-    if (responseJSON.status.httpStatus === 200) {
-      //make sure there is content inside the response before return it to signin function
-      return responseJSON;
-    } else {
-      console.log(responseJSON.message);
-      throw "Verification process unsuccessful: " + responseJSON.message;
-    }
-  } catch (error) {
-    console.log("Verifying token error", error);
-  }
-}
 
 //retrieve clientIdToken and FCMkey and send them to server to verify,
 //then save the neccessary data to local storage

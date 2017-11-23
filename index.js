@@ -6,10 +6,7 @@ import * as React from "react";
 import { AppRegistry, NetInfo, Text, View } from "react-native";
 import firebase from "./app/components/FirebaseInit/FirebaseInit";
 import createNavigationalScreens from "./app/components/Screens";
-import {
-  serverAuth,
-  getUserData
-} from "./app/components/FirebaseAuth/AuthFunctions";
+import { serverAuth, getUserData } from "./app/components/ServerCommsFuncs";
 import Loading from "./app/components/Loading/Loading";
 import { loadData } from "./app/components/Storage/Storage";
 import { savedName } from "./app/constants/constants";
