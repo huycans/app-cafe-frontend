@@ -1,3 +1,4 @@
+//@flow
 import { AccessToken, LoginManager } from "react-native-fbsdk";
 import { GoogleSignin } from "react-native-google-signin";
 
@@ -20,18 +21,18 @@ import sha512 from "crypto-js/sha512";
 const googleWbClientID =
   "301035346897-gbeg8ouav7fbpb28c3q3lk34qoskvrno.apps.googleusercontent.com";
 
-async function getFCMKey() {
+async function getFCMKey(): Promise<string> {
   let FCMkey = firebase.messaging().getToken();
   return FCMkey;
 }
 
-async function secureConnect(method, api) {
+async function secureConnect(method: string, api: string): Promise<JSON> {
   let sessionToken = await loadData(savedName.sessionToken);
   let fcmkey = await loadData(savedName.FCMkey);
   let link = URL + api;
   let currentTime = new Date();
-  let stringToEncode = method + link + currentTime.toISOString() + fcmkey;
-  let hashDigest = toString(sha512(stringToEncode));
+  let hashDigest = sha512(method + link + currentTime.toISOString() + fcmkey);
+
   let serverResponse = await fetch(link, {
     method: method,
     headers: {
@@ -50,7 +51,10 @@ const signinAction = NavigationActions.reset({
 });
 
 //verify clientIdToken, FCMkey with server then return server response
-async function verifyToken(clientIdToken, FCMkey) {
+async function verifyToken(
+  clientIdToken: string,
+  FCMkey: string
+): Promise<any> {
   console.log("verifying");
   try {
     let link = URL + SERVER_API.auth;
@@ -81,7 +85,10 @@ async function verifyToken(clientIdToken, FCMkey) {
 
 //retrieve clientIdToken and FCMkey and send them to server to verify,
 //then save the neccessary data to local storage
-async function serverAuth(currentUser) {
+async function serverAuth(currentUser: {
+  content: {},
+  getIdToken: Function
+}): Promise<void> {
   try {
     let clientIdToken = await currentUser.getIdToken(true);
 
@@ -119,7 +126,7 @@ async function serverAuth(currentUser) {
     console.log("Error while auth with server: ", error);
   }
 }
-async function signinFb(navigation) {
+async function signinFb(navigation: Function): Promise<void> {
   try {
     let result = await LoginManager.logInWithReadPermissions([
       "public_profile",
@@ -162,7 +169,7 @@ async function signinFb(navigation) {
 }
 
 //google signin must be configure before login
-async function setupGoogleSignin() {
+async function setupGoogleSignin(): Promise<void> {
   try {
     await GoogleSignin.hasPlayServices({ autoResolve: true });
     //this method is mandatory
@@ -175,7 +182,7 @@ async function setupGoogleSignin() {
   }
 }
 
-async function signinGoogle(navigation) {
+async function signinGoogle(navigation: Function): Promise<void> {
   try {
     //This method give you the current user if already login or null if not yet signin.
     let user = await GoogleSignin.currentUserAsync();
@@ -204,7 +211,11 @@ async function signinGoogle(navigation) {
   }
 }
 
-async function signupEmail(email, pass, navigation) {
+async function signupEmail(
+  email: string,
+  pass: string,
+  navigation: Function
+): Promise<void> {
   try {
     console.log("Signing up email...");
     await firebase.auth().createUserWithEmailAndPassword(email, pass);
@@ -229,7 +240,11 @@ async function signupEmail(email, pass, navigation) {
   }
 }
 
-async function signinEmail(email, pass, navigation) {
+async function signinEmail(
+  email: string,
+  pass: string,
+  navigation: Function
+): Promise<void> {
   try {
     const currentUser = await firebase
       .auth()
@@ -247,7 +262,10 @@ async function signinEmail(email, pass, navigation) {
   }
 }
 
-async function signout(props, signoutAction) {
+async function signout(
+  props: Object,
+  signoutAction: NavigationActions
+): Promise<void> {
   try {
     await firebase.auth().signOut();
     console.log("User has signed out");

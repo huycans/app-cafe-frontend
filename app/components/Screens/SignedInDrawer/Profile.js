@@ -1,26 +1,8 @@
-import React, { Component } from "react";
-import {
-  DrawerNavigator,
-  NavigationActions,
-  StackNavigator
-} from "react-navigation";
-import {
-  Image,
-  Modal,
-  View,
-  ScrollView,
-  StyleSheet,
-  Linking
-} from "react-native";
-import {
-  signinFb,
-  verifyToken,
-  setupGoogleSignin,
-  signinGoogle,
-  signupEmail,
-  signinEmail,
-  signout
-} from "../../FirebaseAuth/AuthFunctions";
+//@flow
+import * as React from "react";
+import { NavigationActions } from "react-navigation";
+import { Image } from "react-native";
+import { signout } from "../../FirebaseAuth/AuthFunctions";
 import * as Progress from "react-native-progress";
 import {
   Container,
@@ -32,12 +14,8 @@ import {
   Text,
   Button,
   Footer,
-  Left,
-  Right,
   Thumbnail,
-  FooterTab,
-  List,
-  ListItem
+  FooterTab
 } from "native-base";
 import * as Ionicons from "react-native-vector-icons/Ionicons";
 
@@ -48,11 +26,16 @@ const userInfo = {
   points: 60,
   barcode: {}
 };
-export default class Profile extends Component {
-  constructor(props) {
+type PropType = {
+  screenProps: {
+    signedIn: boolean
+  }
+};
+export default class Profile extends React.Component<PropType, void> {
+  constructor(props: PropType) {
     super(props);
   }
-  render() {
+  render(): React.Node {
     //use signoutAction var to reset(delete) the stack and navigate to SigninAndSignup screen
     const signoutAction = NavigationActions.reset({
       index: 0,
@@ -155,7 +138,10 @@ export default class Profile extends Component {
         </Content>
         <Footer>
           <FooterTab>
-            <Button block onPress={() => signout(this.props, signoutAction)}>
+            <Button
+              block
+              onPress={(): Promise<void> => signout(this.props, signoutAction)}
+            >
               <Ionicons.default
                 name="md-log-out"
                 size={iconSize}

@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+//@flow
+import * as React from "react";
 import { Image, Modal, View, ScrollView, StyleSheet } from "react-native";
 import {
   Container,
@@ -16,8 +17,26 @@ import { URL, SERVER_API } from "../../../constants/constants";
 import Loading from "../../Loading/Loading";
 import * as MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-export default class Newsfeed extends Component {
-  constructor(props) {
+type PropType = any;
+
+type StateType = {
+  hasNewsfeed: boolean,
+  newsfeedData: ?Array<NewsfeedDataType>,
+  modalVisible: boolean,
+  selectedPost: ?NewsfeedDataType
+};
+type NewsfeedDataType = {
+  created_time: "string",
+  full_picture: "string",
+  id: "string",
+  link: "string",
+  message: "string",
+  source: "string"
+};
+export default class Newsfeed extends React.Component<PropType, StateType> {
+  getNewsfeed: Function;
+  setModalVisible: Function;
+  constructor(props: any) {
     super(props);
     this.state = {
       hasNewsfeed: false,
@@ -28,7 +47,7 @@ export default class Newsfeed extends Component {
     this.getNewsfeed = this.getNewsfeed.bind(this);
     this.setModalVisible = this.setModalVisible.bind(this);
   }
-  async getNewsfeed() {
+  async getNewsfeed(): Promise<any> {
     try {
       console.log("getting newsfeed");
       let link = URL + SERVER_API.feed;
@@ -49,26 +68,26 @@ export default class Newsfeed extends Component {
   componentDidMount() {
     var self = this; //do this so that setstate in callback below can see "this"
     this.getNewsfeed().then(
-      function(newsfeed) {
+      function(newsfeed: Array<NewsfeedDataType>) {
         console.log(newsfeed);
         //storeData(savedName.newsfeed, newsfeed);
         self.setState({ newsfeedData: newsfeed });
         self.setState({ hasNewsfeed: true });
       },
-      function(error) {
+      function(error: Error) {
         console.log(error);
       }
     );
   }
 
-  setModalVisible(visible, post) {
+  setModalVisible(visible: boolean, post: Object) {
     this.setState({
       modalVisible: visible,
       selectedPost: post
     });
   }
 
-  render() {
+  render(): React.Node {
     console.log("Newsfeed rendering");
     let { hasNewsfeed, newsfeedData, selectedPost } = this.state;
     let Display = null;
@@ -76,10 +95,10 @@ export default class Newsfeed extends Component {
       Display = Loading;
     } else {
       // let { created_time, full_picture, id, link, message, source } = newsfeedData[0];
-      Display = () => (
+      Display = (): React.Node => (
         <List
           dataArray={newsfeedData}
-          renderRow={rowData => {
+          renderRow={(rowData: Object): React.Node => {
             // let postDate = new Date(rowData.created_time);
             // console.log(postDate);
             let messageDigest = rowData.message.slice(0, 100) + " ... ";
@@ -107,7 +126,7 @@ export default class Newsfeed extends Component {
                   <CardItem
                     cardBody
                     button
-                    onPress={() => this.setModalVisible(true, rowData)}
+                    onPress={(): void => this.setModalVisible(true, rowData)}
                   >
                     <Text style={{ textAlign: "left", margin: 10 }}>
                       {messageDigest}
@@ -137,7 +156,7 @@ export default class Newsfeed extends Component {
         />
       );
     }
-    const ModalCard = props =>
+    const ModalCard = (props: { selectedPost: NewsfeedDataType }): React.Node =>
       !props.selectedPost ? (
         <View />
       ) : (
@@ -149,7 +168,7 @@ export default class Newsfeed extends Component {
             backgroundColor="transparent"
             color="black"
             size={30}
-            onPress={() =>
+            onPress={(): void =>
               this.setModalVisible(
                 !this.state.modalVisible,
                 this.state.selectedPost
@@ -182,7 +201,7 @@ export default class Newsfeed extends Component {
             animationType="slide"
             transparent={false}
             visible={this.state.modalVisible}
-            onRequestClose={() =>
+            onRequestClose={(): void =>
               this.setModalVisible(
                 !this.state.modalVisible,
                 this.state.selectedPost

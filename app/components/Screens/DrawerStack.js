@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+//@flow
+import * as React from "react";
 import {
   Image,
   Modal,
@@ -28,7 +29,7 @@ const SignedInDrawer = DrawerNavigator(
       navigationOptions: {
         gesturesEnabled: false,
         drawerLabel: "Profile",
-        drawerIcon: () => (
+        drawerIcon: (): React.Node => (
           <FontAwesomeIcons.default name="user-circle-o" size={iconSize} />
         )
       }
@@ -38,7 +39,7 @@ const SignedInDrawer = DrawerNavigator(
       navigationOptions: {
         gesturesEnabled: false,
         drawerLabel: "TIN TỨC",
-        drawerIcon: () => (
+        drawerIcon: (): React.Node => (
           <FontAwesomeIcons.default name="newspaper-o" size={iconSize} />
         )
       }
@@ -48,7 +49,7 @@ const SignedInDrawer = DrawerNavigator(
       navigationOptions: {
         gesturesEnabled: false,
         drawerLabel: "ĐỔI ĐIỂM",
-        drawerIcon: () => (
+        drawerIcon: (): React.Node => (
           <FontAwesomeIcons.default name="exchange" size={iconSize} />
         )
       }
@@ -58,7 +59,7 @@ const SignedInDrawer = DrawerNavigator(
       navigationOptions: {
         gesturesEnabled: false,
         drawerLabel: "CÀI ĐẶT",
-        drawerIcon: () => (
+        drawerIcon: (): React.Node => (
           <SimpleLineIcons.default name="settings" size={iconSize} />
         )
       }
@@ -67,6 +68,13 @@ const SignedInDrawer = DrawerNavigator(
   { initialRouteName: "Newsfeed" }
 );
 
+type NavOptionsType = {
+  headerStyle: { backgroundColor: string },
+  title: ?string,
+  gesturesEnabled: boolean,
+  headerTintColor: string,
+  headerLeft: React.Node
+};
 //the drawers are inside of another stack
 const MainDrawerStack = StackNavigator(
   {
@@ -74,7 +82,7 @@ const MainDrawerStack = StackNavigator(
   },
   {
     headerMode: "float",
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({ navigation }: any): NavOptionsType => ({
       headerStyle: { backgroundColor: "#FCD836" },
       title: null,
       gesturesEnabled: false,
