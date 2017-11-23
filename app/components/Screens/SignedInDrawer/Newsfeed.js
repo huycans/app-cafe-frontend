@@ -71,8 +71,7 @@ export default class Newsfeed extends React.Component<PropType, StateType> {
       function(newsfeed: Array<NewsfeedDataType>) {
         console.log(newsfeed);
         //storeData(savedName.newsfeed, newsfeed);
-        self.setState({ newsfeedData: newsfeed });
-        self.setState({ hasNewsfeed: true });
+        self.setState({ newsfeedData: newsfeed, hasNewsfeed: true });
       },
       function(error: Error) {
         console.log(error);

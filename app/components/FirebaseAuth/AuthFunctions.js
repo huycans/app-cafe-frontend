@@ -26,23 +26,66 @@ async function getFCMKey(): Promise<string> {
   return FCMkey;
 }
 
-async function secureConnect(method: string, api: string): Promise<JSON> {
-  let sessionToken = await loadData(savedName.sessionToken);
-  let fcmkey = await loadData(savedName.FCMkey);
-  let link = URL + api;
-  let currentTime = new Date();
-  let hashDigest = sha512(method + link + currentTime.toISOString() + fcmkey);
-
-  let serverResponse = await fetch(link, {
-    method: method,
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      sessionToken: sessionToken,
-      enc: hashDigest
+async function secureConnect(
+  method: string,
+  api: string,
+  userId: string,
+  sessionToken: string,
+  fcmKey: string
+): Promise<any> {
+  try {
+    console.log("starting getting user data");
+    let currentTime = new Date().toISOString();
+    //Hashing.sha512().hashString("GET /user/info/$userId $currentTime $fcmKey", Charsets.UTF_8).toString()
+    let hashDigest = sha512(
+      `${method} ${api}/${userId} ${currentTime} ${fcmKey}`
+    ).toString();
+    console.log("hash digest: ", hashDigest);
+    let link = `${URL}${api}/${userId}?emit=${currentTime}`;
+    let serverResponse = await fetch(link, {
+      method: method,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        sessionToken: sessionToken,
+        enc: hashDigest
+      }
+    });
+    console.log("secure connect serverResponse: ", serverResponse);
+    let responseJSON = await serverResponse.json();
+    console.log("secure connect responseJSON: ", responseJSON);
+    if (responseJSON.status.httpStatus === 200) {
+      //make sure there is content inside the response before return it to signin function
+      return responseJSON;
+    } else {
+      console.log(responseJSON.message);
+      throw responseJSON.message;
     }
-  });
-  return serverResponse.json();
+  } catch (error) {
+    console.log("Error when securely connect to server: ", error);
+  }
+}
+
+async function getUserData(
+  userId: string,
+  sessionToken: string,
+  fcmKey: string
+): Promise<void> {
+  try {
+    console.log("getting user data");
+    //let userId = await loadData(savedName.userIdFromServer);
+    let userData = await secureConnect(
+      "GET",
+      SERVER_API.userinfo,
+      userId,
+      sessionToken,
+      fcmKey
+    );
+    return userData;
+    //TODO: store data
+  } catch (error) {
+    console.log("get user data error: ", error);
+  }
 }
 
 const signinAction = NavigationActions.reset({
@@ -94,7 +137,7 @@ async function serverAuth(currentUser: {
 
     console.log("clientIDToken", clientIdToken);
 
-    //get fcmkey
+    //get fcmKey
     let FCMkey = await getFCMKey();
     console.log("FCMkey", FCMkey);
 
@@ -102,25 +145,29 @@ async function serverAuth(currentUser: {
     let serverResponse = await verifyToken(clientIdToken, FCMkey);
     console.log("server Response ", serverResponse);
     if (serverResponse.content) {
-      storeData(
+      await storeData(
         savedName.userIdFromServer,
-        serverResponse.content.userId,
-        timePeriod.oneMonth
+        serverResponse.content.userId
       );
-      storeData(
+      await storeData(
         savedName.sessionToken,
-        serverResponse.content.sessionToken,
-        timePeriod.oneDay
+        serverResponse.content.sessionToken
       );
-      storeData(
+      await storeData(
         savedName.userKeyFromServer,
-        serverResponse.content.userKey,
-        timePeriod.oneMonth
+        serverResponse.content.userKey
       );
-      storeData(savedName.FCMkey, FCMkey, timePeriod.oneDay);
+      await storeData(savedName.FCMkey, FCMkey);
     } else {
       throw Error("Veryfing failed: no content exist");
     }
+
+    let userData = await getUserData(
+      serverResponse.content.userId,
+      serverResponse.content.sessionToken,
+      FCMkey
+    );
+    console.log("user data:", userData);
   } catch (error) {
     alert(error.message);
     console.log("Error while auth with server: ", error);
@@ -304,6 +351,8 @@ async function signout(
 //             )
 // }}
 export {
+  secureConnect,
+  getUserData,
   serverAuth,
   signinFb,
   verifyToken,

@@ -1,15 +1,6 @@
 //@flow
 import * as React from "react";
 import {
-  Image,
-  Modal,
-  View,
-  ScrollView,
-  StyleSheet,
-  Linking,
-  Dimensions
-} from "react-native";
-import {
   DrawerNavigator,
   NavigationActions,
   StackNavigator
@@ -65,7 +56,7 @@ const SignedInDrawer = DrawerNavigator(
       }
     }
   },
-  { initialRouteName: "Newsfeed" }
+  { initialRouteName: "Profile" }
 );
 
 type NavOptionsType = {

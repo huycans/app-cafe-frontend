@@ -2,7 +2,8 @@
 import * as React from "react";
 import { NavigationActions } from "react-navigation";
 import { Image } from "react-native";
-import { signout } from "../../FirebaseAuth/AuthFunctions";
+import { signout, secureConnect } from "../../FirebaseAuth/AuthFunctions";
+import { savedName, SERVER_API } from "../../../constants/constants";
 import * as Progress from "react-native-progress";
 import {
   Container,
@@ -18,11 +19,12 @@ import {
   FooterTab
 } from "native-base";
 import * as Ionicons from "react-native-vector-icons/Ionicons";
+import { loadData } from "../../Storage/Storage";
 
 const iconSize = 22;
 const userInfo = {
   name: "Adam smith",
-  memberClass: "Thành viên mới",
+  member_class: "Thành viên mới",
   points: 60,
   barcode: {}
 };
@@ -32,9 +34,11 @@ type PropType = {
   }
 };
 export default class Profile extends React.Component<PropType, void> {
+  getUserData: Function;
   constructor(props: PropType) {
     super(props);
   }
+
   render(): React.Node {
     //use signoutAction var to reset(delete) the stack and navigate to SigninAndSignup screen
     const signoutAction = NavigationActions.reset({
@@ -76,7 +80,7 @@ export default class Profile extends React.Component<PropType, void> {
                   {userInfo.name}
                 </Text>
                 <Text note style={[{ color: "white" }]}>
-                  {userInfo.memberClass}
+                  {userInfo.member_class}
                 </Text>
                 <Text note style={[{ color: "yellow" }]}>
                   {userInfo.points + " điểm"}

@@ -4,6 +4,10 @@ declare module 'crypto-js' {
   declare module.exports: any;
 }
 
+declare module 'crypto-js/sha512' {
+  declare module.exports: any;
+}
+
 declare module 'firebase' {
   declare module.exports: any;
 }
@@ -41,6 +45,22 @@ declare module 'react-native-storage' {
 }
 
 declare module 'react-native-vector-icons' {
+  declare module.exports: any;
+}
+
+declare module 'react-native-vector-icons/MaterialIcons' {
+  declare module.exports: any;
+}
+
+declare module 'react-native-vector-icons/FontAwesome' {
+  declare module.exports: any;
+}
+
+declare module 'react-native-vector-icons/SimpleLineIcons' {
+  declare module.exports: any;
+}
+
+declare module 'react-native-vector-icons/Ionicons' {
   declare module.exports: any;
 }
 
