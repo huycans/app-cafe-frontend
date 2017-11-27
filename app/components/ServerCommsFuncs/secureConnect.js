@@ -16,7 +16,6 @@ async function secureConnect(
     let hashDigest = sha512(
       `${method} ${api}/${userId} ${currentTime} ${fcmKey}`
     ).toString();
-    console.log("hash digest: ", hashDigest);
     let link = `${URL}${api}/${userId}?emit=${currentTime}`;
     let serverResponse = await fetch(link, {
       method: method,
@@ -27,9 +26,7 @@ async function secureConnect(
         enc: hashDigest
       }
     });
-    console.log("secure connect serverResponse: ", serverResponse);
     let responseJSON = await serverResponse.json();
-    console.log("secure connect responseJSON: ", responseJSON);
     if (responseJSON.status.httpStatus === 200) {
       //make sure there is content inside the response before return it to signin function
       return responseJSON;

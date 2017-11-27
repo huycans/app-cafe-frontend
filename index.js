@@ -6,14 +6,15 @@ import * as React from "react";
 import { AppRegistry, NetInfo, Text, View } from "react-native";
 import firebase from "./app/components/FirebaseInit/FirebaseInit";
 import createNavigationalScreens from "./app/components/Screens";
-import { serverAuth, getUserData } from "./app/components/ServerCommsFuncs";
+import { serverAuth } from "./app/components/FirebaseAuth/AuthFunctions";
+import { getUserData } from "./app/components/ServerCommsFuncs";
 import Loading from "./app/components/Loading/Loading";
-import { loadData } from "./app/components/Storage/Storage";
+import { loadData, removeData } from "./app/components/Storage/Storage";
 import { savedName } from "./app/constants/constants";
 
 type StateType = {
   isSignedIn: ?boolean,
-  hasLocalCache: boolean,
+  hasLocalCache: boolean, 
   isOnline: boolean,
   hasCheckNetworkStatus: boolean
 };
@@ -38,6 +39,7 @@ export default class CafeApp extends React.Component<void, StateType> {
     this.checkNetworkStatus = this.checkNetworkStatus.bind(this);
     this.handleSignInCheck = this.handleSignInCheck.bind(this);
     this.handleNetworkStatusChange = this.handleNetworkStatusChange.bind(this);
+    removeData(savedName.userInfoData);
   }
 
   componentDidMount() {
@@ -79,10 +81,10 @@ export default class CafeApp extends React.Component<void, StateType> {
     );
   }
 
-  handleSignInCheck(user: Object) {
+  async handleSignInCheck(user: Object): Promise<void> {
     if (user) {
       //if user is signed in
-      serverAuth(user);
+      await serverAuth(user);
       this.setState({ hasLocalCache: true, isSignedIn: true });
     } else {
       //no user is signed in

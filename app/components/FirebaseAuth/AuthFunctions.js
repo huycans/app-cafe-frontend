@@ -62,7 +62,8 @@ async function serverAuth(currentUser: {
       serverResponse.content.sessionToken,
       FCMkey
     );
-    console.log("user data:", userData);
+
+    await storeData(savedName.userInfoData, userData);
   } catch (error) {
     alert(error.message);
     console.log("Error while auth with server: ", error);

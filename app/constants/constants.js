@@ -1,8 +1,8 @@
 //constants for api access
-//const PROTOCOL = "https://";
-const PROTOCOL = "http://";
-const SERVER_IP = "192.168.137.1:3005";
-//const SERVER_IP = 'morning-headland-89461.herokuapp.com';
+const PROTOCOL = "https://";
+// const PROTOCOL = "http://";
+// const SERVER_IP = "192.168.137.1:3005";
+const SERVER_IP = "morning-headland-89461.herokuapp.com";
 const SERVER_LINK = "/ebolo-app-cafe/rest-api";
 const SERVER_API = {
   auth: "/auth",
@@ -22,7 +22,8 @@ const savedName = {
   userKeyFromServer: "userKeyFromServer",
   sessionToken: "sessionToken",
   FCMkey: "FCMkey",
-  newsfeed: "newsfeed"
+  newsfeed: "newsfeed",
+  userInfoData: "userInfoData"
 };
 
 const baseFontSize = 16;

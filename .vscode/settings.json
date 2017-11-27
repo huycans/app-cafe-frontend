@@ -1,2 +1,14 @@
 {
+    "terminal.integrated.shell.windows":
+    "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "workbench.iconTheme": "vscode-great-icons",
+  "javascript.validate.enable": false,
+  "eslint.nodePath":
+    "F:\\nativeApp\\app-cafe-frontend-2\\app-cafe-frontend\\node_modules",
+  "eslint.workingDirectories": ["./components"],
+  "editor.formatOnSave": true,
+  "javascript.format.enable": false,
+  "prettier.eslintIntegration": true,
+  "flow.useNPMPackagedFlow": true,
+  "flow.runOnEdit": false
 }

@@ -16,7 +16,7 @@ async function getUserData(
       sessionToken,
       fcmKey
     );
-    return userData;
+    return userData.content;
     //TODO: store data
   } catch (error) {
     console.log("get user data error: ", error);
