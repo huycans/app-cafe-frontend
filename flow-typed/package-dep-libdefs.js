@@ -75,3 +75,7 @@ declare module 'react-redux' {
 declare module 'redux' {
   declare module.exports: any;
 }
+
+declare module 'timeago-react' {
+  declare module.exports: any;
+}

@@ -18,6 +18,13 @@ import { TabNavigator } from "react-navigation";
 import Loading from "../../Loading/Loading";
 import * as MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
+const today = new Date();
+const formatTime = (time: Object): string => {
+  if (time.toDateString() === today.toDateString()) return "Hôm nay";
+  return `${time.getDate()}/${time.getMonth() +
+    1}/${time.getFullYear()} ${time.getHours()}:${time.getMinutes()}`;
+};
+
 type PropType = any;
 
 type StateType = {
@@ -100,9 +107,9 @@ class FBFeed extends React.Component<PropType, StateType> {
         <List
           dataArray={feedData}
           renderRow={(rowData: Object): React.Node => {
-            // let postDate = new Date(rowData.created_time);
-            // console.log(postDate);
             let messageDigest = rowData.message.slice(0, 100) + " ... ";
+            let d = new Date(rowData.created_time);
+            let formattedDate = formatTime(d);
             return (
               <ListItem
                 button
@@ -146,7 +153,7 @@ class FBFeed extends React.Component<PropType, StateType> {
                           fontSize: 10
                         }}
                       >
-                        {rowData.created_time}
+                        {formattedDate}
                       </Text>
                     </Right>
                   </CardItem>
@@ -314,6 +321,8 @@ class AdminPost extends React.Component<PropType, PostStateType> {
             // let postDate = new Date(rowData.created_time);
             // console.log(postDate);
             let messageDigest = rowData.message.slice(0, 100) + " ... ";
+            let d = new Date(rowData.created_time);
+            let formattedDate = formatTime(d);
             return (
               <ListItem
                 button
@@ -357,7 +366,7 @@ class AdminPost extends React.Component<PropType, PostStateType> {
                           fontSize: 10
                         }}
                       >
-                        {rowData.created_time}
+                        {formattedDate}
                       </Text>
                     </Right>
                   </CardItem>
