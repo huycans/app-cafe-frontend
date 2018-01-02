@@ -18,11 +18,10 @@ import { TabNavigator } from "react-navigation";
 import Loading from "../../Loading/Loading";
 import * as MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-const today = new Date();
+const TODAY = new Date();
 const formatTime = (time: Object): string => {
-  if (time.toDateString() === today.toDateString()) return "Hôm nay";
-  return `${time.getDate()}/${time.getMonth() +
-    1}/${time.getFullYear()} ${time.getHours()}:${time.getMinutes()}`;
+  if (time.toDateString() === TODAY.toDateString()) return "Hôm nay";
+  return `${time.getDate()}/${time.getMonth() + 1}/${time.getFullYear()}`;
 };
 
 type PropType = any;
@@ -59,7 +58,6 @@ class FBFeed extends React.Component<PropType, StateType> {
   }
   async getFBFeed(): Promise<any> {
     try {
-      console.log("getting newsfeed");
       let link = URL + SERVER_API.feed;
       let newsfeed = await fetch(link, {
         method: "GET",
@@ -79,8 +77,6 @@ class FBFeed extends React.Component<PropType, StateType> {
     var self = this; //do this so that setstate in callback below can see "this"
     this.getFBFeed().then(
       function(newsfeed: Array<FBFeedDataType>) {
-        console.log(newsfeed);
-        //storeData(savedName.newsfeed, newsfeed);
         self.setState({ feedData: newsfeed, hasFBFeed: true });
       },
       function(error: Error) {
@@ -176,6 +172,8 @@ class FBFeed extends React.Component<PropType, StateType> {
             backgroundColor="transparent"
             color="black"
             size={30}
+            underlayColor="#EBEBEB"
+            activeOpacity={0.3}
             onPress={(): void =>
               this.setModalVisible(
                 !this.state.modalVisible,
@@ -318,8 +316,6 @@ class AdminPost extends React.Component<PropType, PostStateType> {
         <List
           dataArray={feedData}
           renderRow={(rowData: Object): React.Node => {
-            // let postDate = new Date(rowData.created_time);
-            // console.log(postDate);
             let messageDigest = rowData.message.slice(0, 100) + " ... ";
             let d = new Date(rowData.created_time);
             let formattedDate = formatTime(d);
