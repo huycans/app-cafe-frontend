@@ -7,54 +7,76 @@ import {
   fork,
   all
 } from "redux-saga/effects";
-import { eventChannel } from "redux-saga";
 import {
+  STARTUP_SIGNIN_REQUEST,
   CHECK_NETWORK_STATUS,
-  CHECK_LOCAL_CACHE,
-  CHECK_SIGNIN_REQUEST,
-  HAD_CHECK_NETWORK_STATUS,
-  CHECK_SIGNIN_RESULT,
-  NETWORK_STATUS_CHANGE
+  SIGNING_IN,
+  FIREBASE_UNSUBSCRIBE_FUNCTION_RECIEVED,
+  SIGNIN_SUCCESS,
+  SIGNIN_FAILURE
 } from "../actions/auth";
+import firebase from "../components/FirebaseInit/FirebaseInit";
+import { checkNetworkStatus, watchOnNetworkStatusChange } from "./netStatSagas";
 
-import { NetInfo } from "react-native";
+import { serverAuth } from "../components/ServerCommsFuncs";
 
-function createNetInfoChannel() {
-  return eventChannel(emitter => {
-    NetInfo.addEventListener("connectionChange", connectionInfo => {
-      console.log("Network status is " + connectionInfo.type);
-      if (connectionInfo.type === "none") {
-        emitter({ isOnline: false });
-      } else {
-        emitter({ isOnline: true });
-      }
-      // yield put({type: HAD_CHECK_NETWORK_STATUS, status: ? connectionInfo.type === "none": })
-    });
-    const unsubscribe = () => {
-      NetInfo.removeEventListener("connectionChange", () => {});
-    };
-  });
-}
+// export function createUserStatChannel() {
+//   return eventChannel(emitter => {
+//     const unsubscribe = firebase.auth().onAuthStateChanged(currentUser => {
+//       emitter({currentUser: currentUser});
+//     });
+//   });
+// }
 
-function* checkNetworkStatus() {
-  let isConnected = yield NetInfo.isConnected.fetch();
-  console.log("Network status is " + (isConnected ? "online" : "offline"));
-  yield put({ type: HAD_CHECK_NETWORK_STATUS, status: isConnected });
-}
+// export function* onUserStatusChange(){
+//   let UserStatusChan = yield call(createUserStatChannel);
+//   while (true){
+//     const currentUser = yield take(UserStatusChan);
+//     //logic to deal with when user status change
+//     if (currentUser){
+//       //user is signed in
+//       yield put
+//     }else {
+//       //no one is signed in
+//     }
+//   }
+// }
 
-function* watchOnNetworkStatusChange() {
-  const NetInfoChan = yield call(createNetInfoChannel);
+const startupSigninFlow = function* startupSigninFlow() {
   while (true) {
-    const newStatus = yield take(NetInfoChan); //is an object { isOnline: boolean }
-    yield put({ type: NETWORK_STATUS_CHANGE, newStatus });
+    yield take(STARTUP_SIGNIN_REQUEST);
+    yield put({ type: SIGNING_IN });
+    yield put({ type: CHECK_NETWORK_STATUS });
+    try {
+      let netStat = yield select(state => state.isOnline);
+      console.log(netStat);
+      if (netStat) {
+        let user;
+        //set up a listener channel for firebase.auth.onAuthStateChangedyie
+        const unsubscribe = firebase.auth().onAuthStateChanged(currentUser => {
+          user = currentUser;
+        });
+        if (user) {
+          //if user is signed in
+          yield serverAuth(user);
+          yield put({ type: SIGNIN_SUCCESS, user, unsubscribe });
+        } else {
+          //no user is signed in
+          yield put({ type: SIGNIN_FAILURE, message: "NOT_SIGNIN" });
+        }
+      } else {
+        //checkLocalCache
+      }
+    } catch (error) {
+      yield put({ type: SIGNIN_FAILURE, message: error.message });
+    }
   }
-}
-
-function* rootSaga() {
+};
+const rootSaga = function* rootSaga() {
   yield all([
     takeEvery("CHECK_NETWORK_STATUS", checkNetworkStatus),
-    fork(watchOnNetworkStatusChange)
+    fork(watchOnNetworkStatusChange),
+    fork(startupSigninFlow)
   ]);
-}
-
+};
 export default rootSaga;

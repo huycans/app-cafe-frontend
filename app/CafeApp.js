@@ -4,17 +4,13 @@
 
 import * as React from "react";
 import { NetInfo, Text, View } from "react-native";
-import { addNavigationHelpers } from "react-navigation";
 import { connect } from "react-redux";
 
-import firebase from "./components/FirebaseInit/FirebaseInit";
-import Navigator from "./components/Screens/Screens";
+import NavigatorWithReduxNav from "./components/Screens/Screens";
 import { serverAuth } from "./components/FirebaseAuth/AuthFunctions";
-import { getUserData } from "./components/ServerCommsFuncs";
-import Loading from "./components/Loading/Loading";
 import { loadData, removeData } from "./components/Storage/Storage";
 import { savedName } from "./constants/constants";
-import { checkNetworkStatus } from "./actions/auth";
+import { signinRequest, startupSigninRequest } from "./actions/auth";
 
 type StateType = {
   isSignedIn: ?boolean,
@@ -22,10 +18,17 @@ type StateType = {
   isOnline: boolean,
   hasCheckNetworkStatus: boolean
 };
+
 type PropType = {
-  dispatch: (() => { type: string }) => any
+  dispatch: (() => { type: string }) => any,
+  isSignedIn: boolean,
+  hasLocalCache: boolean,
+  isOnline: boolean,
+  hasCheckNetworkStatus: boolean
+  // firebaseUnsubscribe: () => any
 };
-class CafeApp extends React.Component<PropType, StateType> {
+
+class App extends React.Component<PropType, StateType> {
   checkLocalCache: Function;
   // checkNetworkStatus: Function;
   unsubscribe: ?Function;
@@ -48,10 +51,10 @@ class CafeApp extends React.Component<PropType, StateType> {
     // removeData(savedName.userInfoData);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     //TODO: change this to dispatch(action)
     //check for internet connection
-    this.props.dispatch(checkNetworkStatus());
+    this.props.dispatch(startupSigninRequest());
     // this.checkNetworkStatus().then((isConnected: boolean) => {
     //   this.setState(
     //     { isOnline: isConnected, hasCheckNetworkStatus: true },
@@ -134,9 +137,10 @@ class CafeApp extends React.Component<PropType, StateType> {
   }
 
   componentWillUnmount() {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
+    // let { firebaseUnsubscribe } = this.props;
+    // if (this.firebaseUnsubscribe) {
+    //   this.firebaseUnsubscribe();
+    // }
     NetInfo.removeEventListener(
       "connectionChange",
       this.handleNetworkStatusChange
@@ -145,13 +149,13 @@ class CafeApp extends React.Component<PropType, StateType> {
 
   render(): any {
     console.log("rendering");
-    let Layout = Loading;
+    // let Layout = Loading;
     const {
       isSignedIn,
       hasLocalCache,
       isOnline,
       hasCheckNetworkStatus
-    } = this.state;
+    } = this.props;
     const NetworkErrorMsg = (): React.Node => (
       <View
         style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}
@@ -177,33 +181,29 @@ class CafeApp extends React.Component<PropType, StateType> {
       return <NetworkErrorMsg />;
     }
 
-    //adding state to navigator (integrating redux to react navigation)
-    const App = ({ dispatch, nav }: Object): React.Node => (
-      <Navigator navigation={addNavigationHelpers({ dispatch, state: nav })} />
-    );
-
-    const mapStateToProps = (state: Object): { nav: Object } => ({
-      nav: state.nav
-    });
-
-    const AppWithNavigation = connect(mapStateToProps)(App);
-
     return (
       //isSignedIn is used in case if the user has outdated local cache
       //and authorization with firebase failed than return to signinandup screen
-      <AppWithNavigation screenProps={{ isSignedIn: isSignedIn }} />
+      <NavigatorWithReduxNav screenProps={{ isSignedIn: isSignedIn }} />
     );
   }
 }
 
 const mapStateToProps = (state: Object): Object => {
-  const { isSignedIn, hasLocalCache, isOnline, hasCheckNetworkStatus } = state;
+  const {
+    isSignedIn,
+    hasLocalCache,
+    isOnline,
+    hasCheckNetworkStatus,
+    firebaseUnsubscribe
+  } = state;
   return {
     isSignedIn,
     hasLocalCache,
     isOnline,
-    hasCheckNetworkStatus
+    hasCheckNetworkStatus,
+    firebaseUnsubscribe
   };
 };
-
-export default connect(mapStateToProps)(CafeApp);
+const CafeApp = connect(mapStateToProps)(App);
+export default CafeApp;

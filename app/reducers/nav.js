@@ -1,11 +1,14 @@
 import { NavigationActions } from "react-navigation";
-import Navigator from "../components/Screens/Screens";
+import NavigatorWithReduxNav from "../components/Screens/Screens";
 
-const initialState = Navigator.router.getStateForAction(
+const initialState = NavigatorWithReduxNav.router.getStateForAction(
   NavigationActions.init()
 );
 
 export default (state = initialState, action) => {
-  const nextState = Navigator.router.getStateForAction(action, state);
+  const nextState = NavigatorWithReduxNav.router.getStateForAction(
+    action,
+    state
+  );
   return nextState || state;
 };

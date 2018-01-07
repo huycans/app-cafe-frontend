@@ -1,19 +1,7 @@
-export const CHECK_NETWORK_STATUS = "CHECK_NETWORK_STATUS";
-export const HAD_CHECK_NETWORK_STATUS = "HAD_CHECK_NETWORK_STATUS";
-export const NETWORK_STATUS_CHANGE = "NETWORK_STATUS_CHANGE";
-//user data should be saved locally when CHECK_SIGNIN_REQUEST is done
-// export const FETCH_USER_INFO_REQUEST = "FETCH_USER_INFO_REQUEST";
-// export const FETCH_USER_INFO_FAILURE = "FETCH_USER_INFO_FAILURE";
-// export const FETCH_USER_INFO_SUCCESS = "FETCH_USER_INFO_SUCCESS";
-
-export const CHECK_SIGNIN_REQUEST = "CHECK_SIGNIN_REQUEST";
-export const CHECK_SIGNIN_RESULT = "CHECK_SIGNIN_RESULT";
-
-export const CHECK_LOCAL_CACHE = "CHECK_LOCAL_CACHE";
-export const CACHE_LOADED = "CACHE_LOADED";
-
-export const FIREBASE_UNSUBSCRIBE = "FIREBASE_UNSUBSCRIBE";
-
+/** */
+export const CHECK_NETWORK_STATUS = "CHECK_NETWORK_STATUS"; //check for current netw status
+export const HAD_CHECK_NETWORK_STATUS = "HAD_CHECK_NETWORK_STATUS"; //had the app check for netw status or not
+export const NETWORK_STATUS_CHANGE = "NETWORK_STATUS_CHANGE"; // an event listener will emit this action when netw status change
 export const checkNetworkStatus = () => ({
   type: CHECK_NETWORK_STATUS
 });
@@ -23,20 +11,33 @@ export const hadCheckNetworkStatus = status => ({
   status
 });
 
-export const checkIfSignin = () => ({
-  type: CHECK_SIGNIN_REQUEST
+export const networkStatusChange = status => ({
+  type: NETWORK_STATUS_CHANGE,
+  status
 });
 
-export const hadCheckSignin = user => ({
-  type: CHECK_SIGNIN_RESULT,
-  user
+/** */
+
+export const SIGNIN_REQUEST = "SIGNIN_REQUEST"; //request for signing in
+export const SIGNIN_SUCCESS = "SIGNIN_SUCCESS";
+export const SIGNIN_FAILURE = "SIGNIN_FAILURE";
+export const signinRequest = data => ({
+  //prototype, maybe will change
+  type: SIGNIN_REQUEST,
+  data
 });
 
-export const checkLocalCache = () => ({
-  type: CHECK_LOCAL_CACHE
+export const SIGNING_IN = "SIGNING_IN"; //the app is signing the user in
+export const STARTUP_SIGNIN_REQUEST = "STARTUP_SIGNIN_REQUEST"; //start the process to check if user is signed in or not at startup
+
+export const signingIn = () => ({
+  type: SIGNING_IN
+});
+export const startupSigninRequest = () => ({
+  type: STARTUP_SIGNIN_REQUEST
 });
 
-export const cacheLoad = cache => ({
-  type: CACHE_LOADED,
-  cache
-});
+export const CHECK_LOCAL_CACHE = "CHECK_LOCAL_CACHE";
+export const CACHE_LOADED = "CACHE_LOADED";
+
+export const UNMOUNTING = "UNMOUNTING"; // unsubscribe from firbase and netinfo
