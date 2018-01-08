@@ -2,11 +2,12 @@ import {
   CHECK_NETWORK_STATUS,
   CHECK_LOCAL_CACHE,
   CHECK_SIGNIN_REQUEST,
-  HAD_CHECK_NETWORK_STATUS,
+  HAS_CHECK_NETWORK_STATUS,
   CHECK_SIGNIN_RESULT,
   SIGNIN_SUCCESS,
   SIGNIN_FAILURE,
-  FIREBASE_UNSUBSCRIBE_FUNCTION_RECIEVED
+  FIREBASE_UNSUBSCRIBE_FUNCTION_RECIEVED,
+  NETWORK_STATUS_CHANGE
 } from "../actions/auth";
 
 const initialState = {
@@ -24,7 +25,8 @@ const reducers = (state = initialState, action) => {
   switch (action.type) {
     case CHECK_LOCAL_CACHE:
     case CHECK_SIGNIN_REQUEST:
-    case HAD_CHECK_NETWORK_STATUS:
+    case NETWORK_STATUS_CHANGE:
+    case HAS_CHECK_NETWORK_STATUS:
       return {
         ...state,
         hasCheckNetworkStatus: true,

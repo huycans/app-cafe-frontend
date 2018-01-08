@@ -18,7 +18,7 @@ import {
 import firebase from "../components/FirebaseInit/FirebaseInit";
 import { checkNetworkStatus, watchOnNetworkStatusChange } from "./netStatSagas";
 
-import { serverAuth } from "../components/ServerCommsFuncs";
+import { serverAuth } from "../components/FirebaseAuth/AuthFunctions";
 
 // export function createUserStatChannel() {
 //   return eventChannel(emitter => {
@@ -45,6 +45,7 @@ import { serverAuth } from "../components/ServerCommsFuncs";
 const startupSigninFlow = function* startupSigninFlow() {
   while (true) {
     yield take(STARTUP_SIGNIN_REQUEST);
+    console.log("Signing in");
     yield put({ type: SIGNING_IN });
     yield put({ type: CHECK_NETWORK_STATUS });
     try {

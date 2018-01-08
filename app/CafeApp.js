@@ -4,13 +4,15 @@
 
 import * as React from "react";
 import { NetInfo, Text, View } from "react-native";
-import { connect } from "react-redux";
+import { connect, Provider } from "react-redux";
 
 import NavigatorWithReduxNav from "./components/Screens/Screens";
 import { serverAuth } from "./components/FirebaseAuth/AuthFunctions";
 import { loadData, removeData } from "./components/Storage/Storage";
 import { savedName } from "./constants/constants";
 import { signinRequest, startupSigninRequest } from "./actions/auth";
+
+import store from "./store/store";
 
 type StateType = {
   isSignedIn: ?boolean,
@@ -52,6 +54,7 @@ class App extends React.Component<PropType, StateType> {
   }
 
   componentWillMount() {
+    console.log("Will mount");
     //TODO: change this to dispatch(action)
     //check for internet connection
     this.props.dispatch(startupSigninRequest());
@@ -141,6 +144,7 @@ class App extends React.Component<PropType, StateType> {
     // if (this.firebaseUnsubscribe) {
     //   this.firebaseUnsubscribe();
     // }
+
     NetInfo.removeEventListener(
       "connectionChange",
       this.handleNetworkStatusChange
@@ -205,5 +209,11 @@ const mapStateToProps = (state: Object): Object => {
     firebaseUnsubscribe
   };
 };
+
 const CafeApp = connect(mapStateToProps)(App);
-export default CafeApp;
+
+export default (): React.Node => (
+  <Provider store={store}>
+    <CafeApp />
+  </Provider>
+);
