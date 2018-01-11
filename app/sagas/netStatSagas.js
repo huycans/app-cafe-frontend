@@ -7,6 +7,7 @@ import {
 
 import { NetInfo } from "react-native";
 
+//create a channel to listen to network changes and emit a signal when there is a change
 const createNetInfoChannel = function createNetInfoChannel() {
   return eventChannel(emitter => {
     NetInfo.addEventListener("connectionChange", connectionInfo => {
@@ -27,6 +28,7 @@ const createNetInfoChannel = function createNetInfoChannel() {
   });
 };
 
+//check for the device's network status
 const checkNetworkStatus = function* checkNetworkStatus() {
   let isConnected = yield NetInfo.isConnected.fetch();
   console.log("Network status is " + (isConnected ? "online" : "offline"));
@@ -36,13 +38,14 @@ const checkNetworkStatus = function* checkNetworkStatus() {
   });
 };
 
+// create a watcher for network status change
 const watchOnNetworkStatusChange = function* watchOnNetworkStatusChange() {
   console.log("Watching");
   const NetInfoChan = yield call(createNetInfoChannel);
   while (true) {
     const newStatus = yield take(NetInfoChan); //is an object of type { isOnline: boolean }
     console.log("Caught netw change");
-    yield put({ type: NETWORK_STATUS_CHANGE, newStatus });
+    yield put({ type: NETWORK_STATUS_CHANGE, status: newStatus.isOnline });
   }
 };
 

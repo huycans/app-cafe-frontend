@@ -1,13 +1,13 @@
 /** */
 export const CHECK_NETWORK_STATUS = "CHECK_NETWORK_STATUS"; //check for current netw status
-export const HAD_CHECK_NETWORK_STATUS = "HAD_CHECK_NETWORK_STATUS"; //had the app check for netw status or not
+export const HAS_CHECK_NETWORK_STATUS = "HAS_CHECK_NETWORK_STATUS"; //had the app check for netw status or not
 export const NETWORK_STATUS_CHANGE = "NETWORK_STATUS_CHANGE"; // an event listener will emit this action when netw status change
 export const checkNetworkStatus = () => ({
   type: CHECK_NETWORK_STATUS
 });
 
-export const hadCheckNetworkStatus = status => ({
-  type: HAD_CHECK_NETWORK_STATUS,
+export const hasCheckNetworkStatus = status => ({
+  type: HAS_CHECK_NETWORK_STATUS,
   status
 });
 

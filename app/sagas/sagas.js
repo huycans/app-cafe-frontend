@@ -42,6 +42,7 @@ import { serverAuth } from "../components/FirebaseAuth/AuthFunctions";
 //   }
 // }
 
+//the flow run when the app is started
 const startupSigninFlow = function* startupSigninFlow() {
   while (true) {
     yield take(STARTUP_SIGNIN_REQUEST);
@@ -73,6 +74,7 @@ const startupSigninFlow = function* startupSigninFlow() {
     }
   }
 };
+
 const rootSaga = function* rootSaga() {
   yield all([
     takeEvery("CHECK_NETWORK_STATUS", checkNetworkStatus),

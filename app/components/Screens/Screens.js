@@ -1,12 +1,12 @@
 //@flow
 import * as React from "react";
 import { Animated, Easing } from "react-native";
-import { StackNavigator, addNavigationHelpers } from "react-navigation";
+import { StackNavigator, NavigationActions } from "react-navigation";
 import MainDrawerStack from "./DrawerStack";
 import SigninAndSignup from "./SigninAndSignup";
 import EmailSignup from "./EmailSignup";
 import { connect } from "react-redux";
-
+import SplashScreen from "./SplashScreen";
 const noTransitionConfig = (): Object => ({
   transitionSpec: {
     duration: 0,
@@ -21,6 +21,14 @@ type PropType = {
 
 const MainStack = StackNavigator(
   {
+    SplashScreen: {
+      screen: SplashScreen,
+      navigationOptions: {
+        title: null,
+        headerLeft: null,
+        header: null
+      }
+    },
     SigninAndSignup: {
       screen: SigninAndSignup,
       navigationOptions: {
@@ -44,24 +52,16 @@ const MainStack = StackNavigator(
       }
     }
   },
-  //TODO: find out how to pass hasLocalCache to navigator
   {
-    // initialRouteName: props.hasLocalCache
-    initialRouteName: false ? "MainDrawerStack" : "SigninAndSignup",
+    // initialRouteName: props.hasLocalCache ? "MainDrawerStack" : "SigninAndSignup",
+    initialRouteName: "SplashScreen",
     transitionConfig: noTransitionConfig
   }
 );
 
-//adding state to navigator (integrating redux to react navigation)
-const Navigator = ({ dispatch, nav }: Object): React.Node => (
-  <MainStack navigation={addNavigationHelpers({ dispatch, state: nav })} />
+const initialState = MainStack.router.getStateForAction(
+  NavigationActions.init()
 );
 
-const mapStateToProps = (state: Object): { nav: Object } => ({
-  nav: state.nav,
-  hasLocalCache: state.hasLocalCache
-});
-
-const NavigatorWithReduxNav = connect(mapStateToProps)(Navigator);
-
-export default NavigatorWithReduxNav;
+export { initialState };
+export default MainStack;
