@@ -5,17 +5,17 @@ import { Dimensions } from "react-native";
 
 const imageWidth = Dimensions.get("window").width / 2;
 
-const SplashScreen = () => {
-  return (
-    <View style={styles.container}>
-      <Image
-        resizeMode="contain"
-        source={require("../../img/yama.png")}
-        style={{ width: imageWidth }}
-      />
-      <Text>Loading...</Text>
-    </View>
-  );
-};
-
-export default SplashScreen;
+export default class SplashScreen extends React.Component {
+  render() {
+    return (
+      <View style={styles.container}>
+        <Image
+          resizeMode="contain"
+          source={require("../../img/yama.png")}
+          style={{ width: imageWidth }}
+        />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+}

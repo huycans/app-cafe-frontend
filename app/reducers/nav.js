@@ -1,6 +1,12 @@
-import MainStack, { initialState } from "../components/Screens/Screens";
+import { NavigationActions } from "react-navigation";
+import MainStack from "../components/Screens/Screens";
 
-export default (state = initialState, action) => {
+const initialState = MainStack.router.getStateForAction(
+  NavigationActions.init()
+);
+const nav = (state = initialState, action) => {
   const nextState = MainStack.router.getStateForAction(action, state);
   return nextState || state;
 };
+
+export default nav;

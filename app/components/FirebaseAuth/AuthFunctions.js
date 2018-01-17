@@ -39,6 +39,7 @@ async function serverAuth(currentUser: {
     //send clientIdToken, FCMkey to server to receive sessionToken and userId
     let serverResponse = await verifyToken(clientIdToken, FCMkey);
     console.log("server Response ", serverResponse);
+    //TODO: maybe store.dispatch these to store
     if (serverResponse.content) {
       await storeData(
         savedName.userIdFromServer,
@@ -69,7 +70,8 @@ async function serverAuth(currentUser: {
     console.log("Error while auth with server: ", error);
   }
 }
-async function signinFb(navigation: Function): Promise<void> {
+
+async function signinFb(): Promise<void> {
   try {
     let result = await LoginManager.logInWithReadPermissions([
       "public_profile",
@@ -95,25 +97,24 @@ async function signinFb(navigation: Function): Promise<void> {
 
       // login with credential
       let currentUser = await firebase.auth().signInWithCredential(credential);
-
-      // now signed in
-      console.log("FBsignin currentUser", currentUser);
-
       await serverAuth(currentUser);
+      return currentUser;
+      // // now signed in
+      // console.log("FBsignin currentUser", currentUser);
 
-      navigation.dispatch(signinAction);
-      //navigation.navigate('MainDrawerStack');
+      // navigation.dispatch(signinAction);
     }
   } catch (error) {
     console.log(`Login with FB fail with error: ${error}`);
-    alert(error.message);
-    console.log(error);
+    throw error.message;
   }
 }
 
 //google signin must be configure before login
-async function setupGoogleSignin(): Promise<void> {
+//this is an immediate function, it will run the moment it is defined
+(async function setupGoogleSignin(): Promise<void> {
   try {
+    console.log("Configure google signin");
     await GoogleSignin.hasPlayServices({ autoResolve: true });
     //this method is mandatory
     await GoogleSignin.configure({
@@ -122,10 +123,11 @@ async function setupGoogleSignin(): Promise<void> {
     });
   } catch (err) {
     console.log("Play services error", err.code, err.message);
+    throw err.message;
   }
-}
+})();
 
-async function signinGoogle(navigation: Function): Promise<void> {
+async function signinGoogle(): Promise<void> {
   try {
     //This method give you the current user if already login or null if not yet signin.
     let user = await GoogleSignin.currentUserAsync();
@@ -140,54 +142,49 @@ async function signinGoogle(navigation: Function): Promise<void> {
     );
 
     let currentUser = await firebase.auth().signInWithCredential(credential);
-    // now signed in
-    console.log("googlesignin currentUser", currentUser);
 
     await serverAuth(currentUser);
 
-    navigation.dispatch(signinAction);
+    return currentUser;
+    // now signed in
+
+    // navigation.dispatch(signinAction);
   } catch (error) {
-    var errorCode = error.code;
+    // var errorCode = error.code;
     var errorMessage = error.message;
     console.log("error when signing in with google", errorMessage);
-    alert(error.errorMessage);
+    throw errorMessage;
   }
 }
 
-async function signupEmail(
-  email: string,
-  pass: string,
-  navigation: Function
-): Promise<void> {
+async function signupEmail(email: string, password: string): Promise<Object> {
   try {
     console.log("Signing up email...");
-    await firebase.auth().createUserWithEmailAndPassword(email, pass);
+    await firebase.auth().createUserWithEmailAndPassword(email, password);
 
-    let currentUser = firebase.auth().currentUser;
+    let currentUser = await firebase.auth().currentUser;
+    console.log("currentUser", currentUser);
     if (currentUser) {
       // User is signed in
       await serverAuth(currentUser);
 
-      navigation.dispatch(signinAction);
+      // navigation.dispatch(signinAction);
+      return currentUser;
     } else {
       //if not then go to EmailSignup screen
-      navigation.navigate("EmailSignup");
+      // navigation.navigate("EmailSignup");
+      return "none";
     }
   } catch (error) {
     // Handle Errors here.
     var errorCode = error.code;
     var errorMessage = error.message;
-    // [START_EXCLUDE]
-    alert(errorMessage);
-    // [END_EXCLUDE]
+
+    throw errorMessage;
   }
 }
 
-async function signinEmail(
-  email: string,
-  pass: string,
-  navigation: Function
-): Promise<void> {
+async function signinEmail(email: string, pass: string): Promise<void> {
   try {
     const currentUser = await firebase
       .auth()
@@ -195,31 +192,29 @@ async function signinEmail(
 
     await serverAuth(currentUser);
 
-    navigation.dispatch(signinAction);
+    return currentUser;
+    // navigation.dispatch(signinAction);
   } catch (error) {
     var errorCode = error.code;
     var errorMessage = error.message;
 
     console.log(errorCode, errorMessage);
-    alert(errorMessage);
+    throw errorMessage;
   }
 }
 
-async function signout(
-  props: Object,
-  signoutAction: NavigationActions
-): Promise<void> {
+async function signout(): Promise<void> {
   try {
     await firebase.auth().signOut();
     console.log("User has signed out");
     clearAllData();
     // Navigate to welcome screen using signoutAction
-    props.navigation.dispatch(signoutAction);
+    // props.navigation.dispatch(signoutAction);
   } catch (error) {
-    var errorCode = error.code;
+    // var errorCode = error.code;
     var errorMessage = error.message;
     console.log(errorMessage);
-    alert(errorMessage);
+    throw errorMessage;
   }
 }
 
@@ -252,7 +247,7 @@ export {
   serverAuth,
   signinFb,
   verifyToken,
-  setupGoogleSignin,
+  // setupGoogleSignin,
   signinGoogle,
   signupEmail,
   signinEmail,

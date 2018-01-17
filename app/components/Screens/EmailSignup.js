@@ -1,20 +1,22 @@
 //@flow
 import React, { Component } from "react";
 import { Text, View, TouchableHighlight, TextInput, Image } from "react-native";
-import { signupEmail } from "../FirebaseAuth/AuthFunctions.js";
 import styles from "./Styles.js";
 import { baseFontSize } from "../../constants/constants";
-
+import { connect } from "react-redux";
+import { signupRequest } from "../../actions/auth";
 type PropType = {
-  navigation: Function
+  navigation: Function,
+  dispatch: Function
 };
 type StateType = {
   email: string,
   password: string,
   validationError: string
 };
+
 //screen used for signing in
-export default class EmailSignup extends Component<PropType, StateType> {
+class EmailSignup extends Component<PropType, StateType> {
   handleInputEmail: Function;
   handleInputPassword: Function;
   validateInput: Function;
@@ -39,14 +41,13 @@ export default class EmailSignup extends Component<PropType, StateType> {
   }
 
   validateInput() {
-    const { navigation } = this.props;
     const { email, password } = this.state;
     //use regex to test email input
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (re.test(this.state.email)) {
       if (this.state.password.length > 5) {
         this.setState({ validationError: "" });
-        signupEmail(email, password, navigation);
+        this.props.dispatch(signupRequest({ email, password }));
       } else {
         this.setState({
           validationError: "Password must be at least 6 characters"
@@ -139,3 +140,5 @@ export default class EmailSignup extends Component<PropType, StateType> {
     );
   }
 }
+
+export default connect()(EmailSignup);

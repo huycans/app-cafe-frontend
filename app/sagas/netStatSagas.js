@@ -40,12 +40,16 @@ const checkNetworkStatus = function* checkNetworkStatus() {
 
 // create a watcher for network status change
 const watchOnNetworkStatusChange = function* watchOnNetworkStatusChange() {
-  console.log("Watching");
   const NetInfoChan = yield call(createNetInfoChannel);
-  while (true) {
-    const newStatus = yield take(NetInfoChan); //is an object of type { isOnline: boolean }
-    console.log("Caught netw change");
-    yield put({ type: NETWORK_STATUS_CHANGE, status: newStatus.isOnline });
+  try {
+    while (true) {
+      const newStatus = yield take(NetInfoChan); //is an object of type { isOnline: boolean }
+      console.log("Caught netw change");
+      yield put({ type: NETWORK_STATUS_CHANGE, status: newStatus.isOnline });
+    }
+  } finally {
+    //if saga is terminated, close the channel
+    NetInfoChan.close();
   }
 };
 

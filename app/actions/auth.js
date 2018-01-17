@@ -17,27 +17,58 @@ export const networkStatusChange = status => ({
 });
 
 /** */
+export const SIGNUP_REQUEST = "SIGNUP_REQUEST";
+export const signupRequest = data => ({
+  type: SIGNUP_REQUEST,
+  data
+});
 
 export const SIGNIN_REQUEST = "SIGNIN_REQUEST"; //request for signing in
 export const SIGNIN_SUCCESS = "SIGNIN_SUCCESS";
 export const SIGNIN_FAILURE = "SIGNIN_FAILURE";
-export const signinRequest = data => ({
+export const signinRequest = (method, data = null) => ({
   //prototype, maybe will change
   type: SIGNIN_REQUEST,
+  method,
   data
+});
+
+export const signinSuccess = (user, unsubscribe = null) => ({
+  type: SIGNIN_SUCCESS,
+  user,
+  ...unsubscribe //this property may or maynot exist, depends on whether unsubscribe is null or not
+});
+
+export const signinFailure = (message = "") => ({
+  type: SIGNIN_FAILURE,
+  message
 });
 
 export const SIGNING_IN = "SIGNING_IN"; //the app is signing the user in
 export const STARTUP_SIGNIN_REQUEST = "STARTUP_SIGNIN_REQUEST"; //start the process to check if user is signed in or not at startup
 
-export const signingIn = () => ({
-  type: SIGNING_IN
-});
 export const startupSigninRequest = () => ({
   type: STARTUP_SIGNIN_REQUEST
 });
 
 export const CHECK_LOCAL_CACHE = "CHECK_LOCAL_CACHE";
-export const CACHE_LOADED = "CACHE_LOADED";
+export const CACHE_CHECKED = "CACHE_CHECKED";
+export const cacheChecked = hasLocalCache => ({
+  type: CACHE_CHECKED,
+  hasLocalCache
+});
+export const SAVE_CACHE = "SAVE_CACHE";
+export const saveCache = (key, data) => ({
+  type: SAVE_CACHE,
+  key,
+  data
+});
 
-export const UNMOUNTING = "UNMOUNTING"; // unsubscribe from firbase and netinfo
+export const SIGNOUT_REQUEST = "SIGNOUT_REQUEST";
+export const signoutRequest = () => ({
+  type: SIGNOUT_REQUEST
+});
+export const UNSUBSCRIBE = "UNSUBSCRIBE"; // unsubscribe from firbase and netinfo
+export const unsubscribe = () => ({
+  type: UNSUBSCRIBE
+});

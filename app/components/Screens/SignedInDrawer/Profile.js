@@ -3,7 +3,6 @@ import * as React from "react";
 import { View } from "react-native";
 import { NavigationActions } from "react-navigation";
 import { Image } from "react-native";
-import { signout } from "../../FirebaseAuth/AuthFunctions";
 import { savedName, SERVER_API } from "../../../constants/constants";
 import * as Progress from "react-native-progress";
 import {
@@ -21,20 +20,20 @@ import {
 import * as Ionicons from "react-native-vector-icons/Ionicons";
 import { loadData } from "../../Storage/Storage";
 import Loading from "../../Loading/Loading";
-
+import { connect } from "react-redux";
+import { signoutRequest } from "../../../actions/auth";
 const iconSize = 22;
 
 type PropType = {
-  screenProps: {
-    signedIn: boolean
-  }
+  isSignedIn: boolean,
+  dispatch: Function
 };
 
 type StateType = {
   userInfo: ?Object
 };
 
-export default class Profile extends React.Component<PropType, StateType> {
+class Profile extends React.Component<PropType, StateType> {
   getUserData: Function;
   constructor(props: PropType) {
     super(props);
@@ -44,31 +43,26 @@ export default class Profile extends React.Component<PropType, StateType> {
   }
 
   componentDidMount() {
-    var self = this;
-    loadData(savedName.userInfoData).then(
-      function(userInfo: Object) {
-        console.log("userInfo: ", userInfo);
-        self.forceUpdate(self.setState({ userInfo: userInfo }));
-      },
-      function(error: Error) {
-        console.log(error);
+    //if the user has outdated local cache and authorization with firebase failed then return to signinandup screen
+    setTimeout(() => {
+      if (this.props.isSignedIn === false) {
+        this.props.dispatch(signoutRequest());
+      } else {
+        var self = this;
+        loadData(savedName.userInfoData).then(
+          function(userInfo: Object) {
+            console.log("userInfo: ", userInfo);
+            self.forceUpdate(self.setState({ userInfo: userInfo }));
+          },
+          function(error: Error) {
+            console.log(error);
+          }
+        );
       }
-    );
+    }, 1000);
   }
 
   render(): React.Node {
-    //use signoutAction var to reset(delete) the stack and navigate to SigninAndSignup screen
-    const signoutAction = NavigationActions.reset({
-      index: 0,
-      key: null,
-      actions: [NavigationActions.navigate({ routeName: "SigninAndSignup" })]
-    });
-
-    //if the user has outdated local cache and authorization with firebase failed than return to signinandup screen
-    if (this.props.screenProps.signedIn === false) {
-      signout(this.props, signoutAction);
-    }
-
     const { userInfo } = this.state;
     let ScreenContent = (): React.Node => <Loading />;
     if (userInfo !== null)
@@ -187,7 +181,7 @@ export default class Profile extends React.Component<PropType, StateType> {
               <Button
                 block
                 onPress={(): Promise<void> =>
-                  signout(this.props, signoutAction)
+                  this.props.dispatch(signoutRequest())
                 }
               >
                 <Ionicons.default
@@ -205,3 +199,11 @@ export default class Profile extends React.Component<PropType, StateType> {
     return <ScreenContent />;
   }
 }
+
+const mapStateToProps = (state: Object): Object => {
+  return {
+    isSignedIn: state.auth.isSignedIn
+  };
+};
+
+export default connect(mapStateToProps)(Profile);

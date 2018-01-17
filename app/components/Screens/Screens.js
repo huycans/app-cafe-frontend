@@ -1,11 +1,11 @@
 //@flow
-import * as React from "react";
+// import * as React from "react";
 import { Animated, Easing } from "react-native";
-import { StackNavigator, NavigationActions } from "react-navigation";
+import { StackNavigator } from "react-navigation";
 import MainDrawerStack from "./DrawerStack";
 import SigninAndSignup from "./SigninAndSignup";
 import EmailSignup from "./EmailSignup";
-import { connect } from "react-redux";
+// import { connect } from "react-redux";
 import SplashScreen from "./SplashScreen";
 const noTransitionConfig = (): Object => ({
   transitionSpec: {
@@ -19,7 +19,7 @@ type PropType = {
   hasLocalCache: boolean
 };
 
-const MainStack = StackNavigator(
+export default StackNavigator(
   {
     SplashScreen: {
       screen: SplashScreen,
@@ -59,9 +59,4 @@ const MainStack = StackNavigator(
   }
 );
 
-const initialState = MainStack.router.getStateForAction(
-  NavigationActions.init()
-);
-
-export { initialState };
-export default MainStack;
+// export default MainStack;

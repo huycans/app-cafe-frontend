@@ -7,7 +7,9 @@ import {
   SIGNIN_SUCCESS,
   SIGNIN_FAILURE,
   FIREBASE_UNSUBSCRIBE_FUNCTION_RECIEVED,
-  NETWORK_STATUS_CHANGE
+  NETWORK_STATUS_CHANGE,
+  CACHE_CHECKED,
+  SIGNIN_REQUEST
 } from "../actions/auth";
 
 const initialState = {
@@ -16,9 +18,9 @@ const initialState = {
   hasLocalCache: false,
   isOnline: false,
   hasCheckNetworkStatus: false,
-  userInfo: {},
   firebaseUnsubscribe: null,
-  errorMessage: ""
+  errorMessage: "",
+  userInfo: {}
 };
 
 const auth = (state = initialState, action) => {
@@ -30,6 +32,11 @@ const auth = (state = initialState, action) => {
         hasCheckNetworkStatus: true,
         isOnline: action.status
       };
+    case SIGNIN_REQUEST:
+      return {
+        ...state,
+        signingIn: true
+      };
     case SIGNIN_SUCCESS:
       return {
         ...state,
@@ -37,7 +44,7 @@ const auth = (state = initialState, action) => {
         isSignedIn: true,
         hasLocalCache: true,
         signingIn: false,
-        firebaseUnsubscribe: action.unsubscribe
+        firebaseUnsubscribe: action.unsubscribe || null
       };
     case SIGNIN_FAILURE:
       return {
@@ -48,6 +55,22 @@ const auth = (state = initialState, action) => {
         signingIn: false,
         errorMessage: action.message
       };
+    case CACHE_CHECKED:
+      if (action.hasLocalCache === true)
+        return {
+          ...state,
+          hasLocalCache: true,
+          userInfo: {
+            ...state.userInfo,
+            userId: action.userId,
+            sessionToken: action.sessionToken
+          }
+        };
+      else
+        return {
+          ...state,
+          hasLocalCache: false
+        };
     case CHECK_LOCAL_CACHE:
     case CHECK_SIGNIN_REQUEST:
     default:

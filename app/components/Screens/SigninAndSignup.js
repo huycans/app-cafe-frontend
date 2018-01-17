@@ -1,24 +1,23 @@
 //@flow
 import React, { Component } from "react";
 import { Text, View, TouchableHighlight, TextInput, Image } from "react-native";
-import {
-  signinFb,
-  setupGoogleSignin,
-  signinGoogle,
-  signinEmail
-} from "../FirebaseAuth/AuthFunctions.js";
+
+import { connect } from "react-redux";
 import styles from "./Styles.js";
+import { signinRequest } from "../../actions/auth";
 
 type PropType = {
-  navigation: () => {}
+  navigation: Function,
+  dispatch: Function
 };
+
 type StateType = {
   email: string,
   password: string
 };
 
 //the first screen that welcome the user when they are not signed in
-export default class SigninAndSignup extends Component<PropType, StateType> {
+class SigninAndSignup extends Component<PropType, StateType> {
   handleInputEmail: Function;
   handleInputPassword: Function;
   constructor(props: PropType) {
@@ -32,10 +31,6 @@ export default class SigninAndSignup extends Component<PropType, StateType> {
     this.handleInputPassword = this.handleInputPassword.bind(this);
   }
 
-  componentDidMount() {
-    setupGoogleSignin();
-  }
-
   handleInputEmail(text: string) {
     this.setState({ email: text });
   }
@@ -46,8 +41,11 @@ export default class SigninAndSignup extends Component<PropType, StateType> {
 
   render(): void {
     const { navigation } = this.props;
-
+    const EMAIL = "EMAIL",
+      FACEBOOK = "FACEBOOK",
+      GOOGLE = "GOOGLE";
     const { email, password } = this.state;
+
     return (
       <Image
         source={require("../../img/vertical-background.png")}
@@ -85,11 +83,12 @@ export default class SigninAndSignup extends Component<PropType, StateType> {
               styles.button,
               { backgroundColor: "#cccc00", minWidth: 100, marginTop: 15 }
             ]}
-            onPress={(): Promise<void> =>
-              signinEmail(email, password, navigation)
+            onPress={(): void =>
+              this.props.dispatch(signinRequest(EMAIL, { email, password }))
             }
             underlayColor="transparent"
             activeOpacity={0.5}
+            disabled={email === "" || password === "" || false}
           >
             <Text style={styles.baseText}>Sign in</Text>
           </TouchableHighlight>
@@ -105,7 +104,7 @@ export default class SigninAndSignup extends Component<PropType, StateType> {
         >
           <TouchableHighlight
             style={styles.button}
-            onPress={(): Promise<void> => signinFb(navigation)}
+            onPress={(): void => this.props.dispatch(signinRequest(FACEBOOK))}
             underlayColor="transparent"
             activeOpacity={0.5}
           >
@@ -116,7 +115,7 @@ export default class SigninAndSignup extends Component<PropType, StateType> {
           </TouchableHighlight>
           <TouchableHighlight
             style={styles.button}
-            onPress={(): Promise<void> => signinGoogle(navigation)}
+            onPress={(): void => this.props.dispatch(signinRequest(GOOGLE))}
             underlayColor="transparent"
             activeOpacity={0.5}
           >
@@ -156,3 +155,5 @@ export default class SigninAndSignup extends Component<PropType, StateType> {
     );
   }
 }
+
+export default connect()(SigninAndSignup);
