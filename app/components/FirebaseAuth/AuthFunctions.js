@@ -26,7 +26,7 @@ const signinAction = NavigationActions.reset({
 async function serverAuth(currentUser: {
   content: {},
   getIdToken: Function
-}): Promise<void> {
+}): Promise<Object> {
   try {
     let clientIdToken = await currentUser.getIdToken(true);
 
@@ -39,7 +39,9 @@ async function serverAuth(currentUser: {
     //send clientIdToken, FCMkey to server to receive sessionToken and userId
     let serverResponse = await verifyToken(clientIdToken, FCMkey);
     console.log("server Response ", serverResponse);
+
     //TODO: maybe store.dispatch these to store
+    //if serverResponse is valid, save these data to local storage
     if (serverResponse.content) {
       await storeData(
         savedName.userIdFromServer,
@@ -58,20 +60,21 @@ async function serverAuth(currentUser: {
       throw Error("Veryfing failed: no content exist");
     }
 
-    let userData = await getUserData(
+    //retrieve user data (name, avatarUrl...) from server
+    let userServerObj = await getUserData(
       serverResponse.content.userId,
       serverResponse.content.sessionToken,
       FCMkey
     );
 
-    await storeData(savedName.userInfoData, userData);
+    return userServerObj;
   } catch (error) {
-    alert(error.message);
     console.log("Error while auth with server: ", error);
+    throw error.message;
   }
 }
 
-async function signinFb(): Promise<void> {
+async function signinFb(): Promise<Object> {
   try {
     let result = await LoginManager.logInWithReadPermissions([
       "public_profile",
@@ -96,9 +99,11 @@ async function signinFb(): Promise<void> {
         );
 
       // login with credential
-      let currentUser = await firebase.auth().signInWithCredential(credential);
-      await serverAuth(currentUser);
-      return currentUser;
+      let userFirebaseObj = await firebase
+        .auth()
+        .signInWithCredential(credential);
+      let userServerObj = await serverAuth(userFirebaseObj);
+      return { userFirebaseObj, userServerObj };
       // // now signed in
       // console.log("FBsignin currentUser", currentUser);
 
@@ -127,7 +132,7 @@ async function signinFb(): Promise<void> {
   }
 })();
 
-async function signinGoogle(): Promise<void> {
+async function signinGoogle(): Promise<Object> {
   try {
     //This method give you the current user if already login or null if not yet signin.
     let user = await GoogleSignin.currentUserAsync();
@@ -141,14 +146,12 @@ async function signinGoogle(): Promise<void> {
       user.idToken
     );
 
-    let currentUser = await firebase.auth().signInWithCredential(credential);
-
-    await serverAuth(currentUser);
-
-    return currentUser;
-    // now signed in
-
-    // navigation.dispatch(signinAction);
+    //retrieve user objects
+    let userFirebaseObj = await firebase
+      .auth()
+      .signInWithCredential(credential);
+    let userServerObj = await serverAuth(userFirebaseObj);
+    return { userFirebaseObj, userServerObj };
   } catch (error) {
     // var errorCode = error.code;
     var errorMessage = error.message;
@@ -162,17 +165,17 @@ async function signupEmail(email: string, password: string): Promise<Object> {
     console.log("Signing up email...");
     await firebase.auth().createUserWithEmailAndPassword(email, password);
 
-    let currentUser = await firebase.auth().currentUser;
-    console.log("currentUser", currentUser);
-    if (currentUser) {
+    let userFirebaseObj = await firebase.auth().currentUser;
+    console.log("currentUser", userFirebaseObj);
+    if (userFirebaseObj) {
       // User is signed in
-      await serverAuth(currentUser);
+
+      let userServerObj = await serverAuth(userFirebaseObj);
+      return { userFirebaseObj, userServerObj };
 
       // navigation.dispatch(signinAction);
-      return currentUser;
     } else {
-      //if not then go to EmailSignup screen
-      // navigation.navigate("EmailSignup");
+      //if not then return this string, signup saga will navigate to EmailSignup screen
       return "none";
     }
   } catch (error) {
@@ -184,15 +187,14 @@ async function signupEmail(email: string, password: string): Promise<Object> {
   }
 }
 
-async function signinEmail(email: string, pass: string): Promise<void> {
+async function signinEmail(email: string, pass: string): Promise<Object> {
   try {
-    const currentUser = await firebase
+    const userFirebaseObj = await firebase
       .auth()
       .signInWithEmailAndPassword(email, pass);
 
-    await serverAuth(currentUser);
-
-    return currentUser;
+    let userServerObj = await serverAuth(userFirebaseObj);
+    return { userFirebaseObj, userServerObj };
     // navigation.dispatch(signinAction);
   } catch (error) {
     var errorCode = error.code;

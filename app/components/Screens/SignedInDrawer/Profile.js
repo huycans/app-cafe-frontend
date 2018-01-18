@@ -26,6 +26,7 @@ const iconSize = 22;
 
 type PropType = {
   isSignedIn: boolean,
+  userServerObj: Object,
   dispatch: Function
 };
 
@@ -43,29 +44,37 @@ class Profile extends React.Component<PropType, StateType> {
   }
 
   componentDidMount() {
-    //if the user has outdated local cache and authorization with firebase failed then return to signinandup screen
     setTimeout(() => {
+      //if the user has outdated local cache and authorization with firebase failed then return to signinandup screen
       if (this.props.isSignedIn === false) {
         this.props.dispatch(signoutRequest());
       } else {
-        var self = this;
-        loadData(savedName.userInfoData).then(
-          function(userInfo: Object) {
-            console.log("userInfo: ", userInfo);
-            self.forceUpdate(self.setState({ userInfo: userInfo }));
-          },
-          function(error: Error) {
-            console.log(error);
-          }
-        );
+        // var self = this;
+        // loadData(savedName.userInfoData).then(
+        //   function(userInfo: Object) {
+        //     console.log("userInfo: ", userInfo);
+        //     self.forceUpdate(self.setState({ userInfo: userInfo }));
+        //   },
+        //   function(error: Error) {
+        //     console.log(error);
+        //   }
+        // );
+
+        //if everything is okay
+        this.forceUpdate(this.setState({ userInfo: this.props.userServerObj }));
       }
-    }, 1000);
+    }, 500);
   }
 
   render(): React.Node {
     const { userInfo } = this.state;
     let ScreenContent = (): React.Node => <Loading />;
-    if (userInfo !== null)
+    if (userInfo) {
+      //default avatar
+      let userAvatar = require("../../../img/ic_launcher.png");
+      //if user's avatar exist, assign it to userAvatar
+      if (userInfo.avatarUrl) userAvatar = { uri: userInfo.avatarUrl };
+
       ScreenContent = (): React.Node => (
         <Container>
           <Content>
@@ -83,9 +92,7 @@ class Profile extends React.Component<PropType, StateType> {
                     }}
                   >
                     <Image
-                      source={{
-                        uri: userInfo.avatarUrl
-                      }}
+                      source={userAvatar}
                       style={{
                         height: 200,
                         width: null,
@@ -96,9 +103,7 @@ class Profile extends React.Component<PropType, StateType> {
                   </View>
                   <Thumbnail
                     style={{ marginTop: "10%" }}
-                    source={{
-                      uri: userInfo.avatarUrl
-                    }}
+                    source={userAvatar}
                     large
                   />
                   <Text
@@ -195,14 +200,15 @@ class Profile extends React.Component<PropType, StateType> {
           </Footer>
         </Container>
       );
-    //return <ScreenContent />;
+    }
     return <ScreenContent />;
   }
 }
 
 const mapStateToProps = (state: Object): Object => {
   return {
-    isSignedIn: state.auth.isSignedIn
+    isSignedIn: state.auth.isSignedIn,
+    userServerObj: state.auth.userServerObj
   };
 };
 

@@ -52,7 +52,7 @@ const checkLocalCache = function* checkLocalCache() {
 };
 
 //used to unsubscribe firebase when unmounting
-//only need to unsub with firebase because netinfo is automatically ended when close app -> end saga -> close channel
+//only need to unsub with firebase because netinfo listener is automatically ended when close app -> end saga -> close channel
 const unsubscribe = function* unsubscribe() {
   yield take(UNSUBSCRIBE);
   console.log("Unsubscribing");
@@ -72,15 +72,17 @@ const startupSigninFlow = function* startupSigninFlow() {
       let netStat = yield select(state => state.auth.isOnline);
       console.log("netStat", netStat);
       if (netStat) {
-        let user;
+        let userFirebaseObj;
         //set up a listener channel for firebase.auth.onAuthStateChangedyie
         const unsubscribe = firebase.auth().onAuthStateChanged(currentUser => {
-          user = currentUser;
+          userFirebaseObj = currentUser;
         });
-        if (user) {
+        if (userFirebaseObj) {
           //if user is signed in
           //authenticate with server
-          yield call(serverAuth, user);
+          let userServerObj = yield call(serverAuth, userFirebaseObj);
+
+          const user = { userFirebaseObj, userServerObj };
           //send user object and unsub func to store
           yield put(signinSuccess(user, unsubscribe));
           //navigate to MainDrawerStack

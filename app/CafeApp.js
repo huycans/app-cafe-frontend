@@ -15,9 +15,9 @@ import { AlertProvider, connectAlert } from "./components/Alert";
 import store from "./store/store";
 import Loading from "./components/Loading/Loading";
 
-type StateType = {
-  errorMessage: string
-};
+// type StateType = {
+//   errorMessage: string
+// };
 
 type PropType = {
   dispatch: (() => { type: string }) => any,
@@ -30,7 +30,7 @@ type PropType = {
   signingIn: boolean
 };
 
-class App extends React.Component<PropType, StateType> {
+class App extends React.Component<PropType, void> {
   checkLocalCache: Function;
   // checkNetworkStatus: Function;
   unsubscribe: ?Function;
@@ -43,7 +43,7 @@ class App extends React.Component<PropType, StateType> {
       // hasLocalCache: false,
       // isOnline: false,
       // hasCheckNetworkStatus: false
-      errorMessage: ""
+      // errorMessage: ""
     };
   }
 
@@ -55,15 +55,15 @@ class App extends React.Component<PropType, StateType> {
   componentWillReceiveProps(nextProps: PropType) {
     //if new error message is different than current one, display it
     if (nextProps.errorMessage !== this.props.errorMessage)
-      this.setState({
-        errorMessage: nextProps.errorMessage
-      });
+      this.props.alertWithType("error", "Error", nextProps.errorMessage);
+    
   }
 
   componentWillUnmount() {
     console.log("Unmounting");
     this.props.dispatch(unsubscribe());
   }
+
   render(): any {
     console.log("rendering");
     // let Layout = Loading;
@@ -104,10 +104,10 @@ class App extends React.Component<PropType, StateType> {
 
     const NavigatorWithReduxNav = connect(mapStateToProps)(Navigator);
 
-    //error message display
-    if (errorMessage) {
-      this.props.alertWithType("error", "Error", errorMessage);
-    }
+    // //error message display
+    // if (errorMessage) {
+    //   this.props.alertWithType("error", "Error", errorMessage);
+    // }
 
     //FIXME: doesn't work
     console.log("signingIn", signingIn);

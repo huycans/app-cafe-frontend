@@ -20,7 +20,8 @@ const initialState = {
   hasCheckNetworkStatus: false,
   firebaseUnsubscribe: null,
   errorMessage: "",
-  userInfo: {}
+  userFirebaseObj: {}, //the user object recieved from firebase
+  userServerObj: {} //the user object received from server
 };
 
 const auth = (state = initialState, action) => {
@@ -40,7 +41,8 @@ const auth = (state = initialState, action) => {
     case SIGNIN_SUCCESS:
       return {
         ...state,
-        userInfo: action.user,
+        userFirebaseObj: action.user.userFirebaseObj,
+        userServerObj: action.user.userServerObj,
         isSignedIn: true,
         hasLocalCache: true,
         signingIn: false,
@@ -49,7 +51,8 @@ const auth = (state = initialState, action) => {
     case SIGNIN_FAILURE:
       return {
         ...state,
-        userInfo: {},
+        userFirebaseObj: {},
+        userServerObj: {},
         isSignedIn: false,
         hasLocalCache: false,
         signingIn: false,
@@ -60,8 +63,8 @@ const auth = (state = initialState, action) => {
         return {
           ...state,
           hasLocalCache: true,
-          userInfo: {
-            ...state.userInfo,
+          userFirebaseObj: {
+            ...state.userFirebaseObj,
             userId: action.userId,
             sessionToken: action.sessionToken
           }

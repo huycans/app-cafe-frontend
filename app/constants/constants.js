@@ -22,8 +22,7 @@ const savedName = {
   userKeyFromServer: "userKeyFromServer",
   sessionToken: "sessionToken",
   FCMkey: "FCMkey",
-  newsfeed: "newsfeed",
-  userInfoData: "userInfoData"
+  newsfeed: "newsfeed"
 };
 
 const baseFontSize = 16;
