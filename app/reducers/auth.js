@@ -9,8 +9,12 @@ import {
   FIREBASE_UNSUBSCRIBE_FUNCTION_RECIEVED,
   NETWORK_STATUS_CHANGE,
   CACHE_CHECKED,
-  SIGNIN_REQUEST
+  SIGNIN_REQUEST,
+  FETCH_QR_CODE_SUCCESS,
+  FETCH_QR_CODE_FAILURE,
+  FETCH_QR_CODE
 } from "../actions/auth";
+import { fetchQRCode } from "../sagas/qrcodeSaga";
 
 const initialState = {
   isSignedIn: null,
@@ -26,7 +30,6 @@ const initialState = {
 
 const auth = (state = initialState, action) => {
   switch (action.type) {
-    case NETWORK_STATUS_CHANGE:
     case HAS_CHECK_NETWORK_STATUS:
       return {
         ...state,
@@ -74,8 +77,26 @@ const auth = (state = initialState, action) => {
           ...state,
           hasLocalCache: false
         };
-    case CHECK_LOCAL_CACHE:
-    case CHECK_SIGNIN_REQUEST:
+    case FETCH_QR_CODE:
+      return {
+        ...state,
+        signingIn: true
+      };
+    case FETCH_QR_CODE_SUCCESS:
+      return {
+        ...state,
+        signingIn: false,
+        userServerObj: {
+          ...state.userServerObj,
+          qrCode: action.qrString
+        }
+      };
+    case FETCH_QR_CODE_FAILURE:
+      return {
+        ...state,
+        signingIn: false,
+        errorMessage: "Failed to load QR code, please reload the app"
+      };
     default:
       return state;
   }

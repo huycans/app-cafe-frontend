@@ -18,10 +18,10 @@ import {
   FooterTab
 } from "native-base";
 import * as Ionicons from "react-native-vector-icons/Ionicons";
-import { loadData } from "../../Storage/Storage";
 import Loading from "../../Loading/Loading";
 import { connect } from "react-redux";
 import { signoutRequest } from "../../../actions/auth";
+import { URL } from "../../../constants/constants";
 const iconSize = 22;
 
 type PropType = {
@@ -38,9 +38,9 @@ class Profile extends React.Component<PropType, StateType> {
   getUserData: Function;
   constructor(props: PropType) {
     super(props);
-    this.state = {
-      userInfo: null
-    };
+    // this.state = {
+    //   userInfo: null
+    // };
   }
 
   componentDidMount() {
@@ -48,32 +48,39 @@ class Profile extends React.Component<PropType, StateType> {
       //if the user has outdated local cache and authorization with firebase failed then return to signinandup screen
       if (this.props.isSignedIn === false) {
         this.props.dispatch(signoutRequest());
-      } else {
-        // var self = this;
-        // loadData(savedName.userInfoData).then(
-        //   function(userInfo: Object) {
-        //     console.log("userInfo: ", userInfo);
-        //     self.forceUpdate(self.setState({ userInfo: userInfo }));
-        //   },
-        //   function(error: Error) {
-        //     console.log(error);
-        //   }
-        // );
-
-        //if everything is okay
-        this.forceUpdate(this.setState({ userInfo: this.props.userServerObj }));
       }
+      // else {
+      // var self = this;
+      // loadData(savedName.userInfoData).then(
+      //   function(userInfo: Object) {
+      //     console.log("userInfo: ", userInfo);
+      //     self.forceUpdate(self.setState({ userInfo: userInfo }));
+      //   },
+      //   function(error: Error) {
+      //     console.log(error);
+      //   }
+      // );
+
+      //if everything is okay
+      // pass the userServerObj to state
+      // this.forceUpdate(this.setState({ userInfo: this.props.userServerObj }));
+      // }
     }, 500);
   }
 
   render(): React.Node {
-    const { userInfo } = this.state;
+    const userInfo = this.props.userServerObj;
     let ScreenContent = (): React.Node => <Loading />;
-    if (userInfo) {
+    //TODO: change this so it wait for qrcode (userinfo.qrcode)
+    //maybe remove state
+    if (userInfo.qrCode != undefined) {
       //default avatar
       let userAvatar = require("../../../img/ic_launcher.png");
       //if user's avatar exist, assign it to userAvatar
       if (userInfo.avatarUrl) userAvatar = { uri: userInfo.avatarUrl };
+      //link to QR code
+      let qrCodeLink = URL + userInfo.qrCode;
+      console.log(qrCodeLink);
 
       ScreenContent = (): React.Node => (
         <Container>
@@ -176,8 +183,8 @@ class Profile extends React.Component<PropType, StateType> {
             >
               <Text style={{ marginTop: 10 }}>Mã tích điểm</Text>
               <Image
-                style={{ width: 200, height: 80, margin: 20 }}
-                source={{ uri: userInfo.barcodeUrl }}
+                style={{ width: 200, height: 200, margin: 10 }}
+                source={{ uri: qrCodeLink }}
               />
             </Card>
           </Content>

@@ -70,7 +70,6 @@ const startupSigninFlow = function* startupSigninFlow() {
     yield take(HAS_CHECK_NETWORK_STATUS);
     try {
       let netStat = yield select(state => state.auth.isOnline);
-      console.log("netStat", netStat);
       if (netStat) {
         let userFirebaseObj;
         //set up a listener channel for firebase.auth.onAuthStateChangedyie
@@ -82,6 +81,13 @@ const startupSigninFlow = function* startupSigninFlow() {
           //authenticate with server
           let userServerObj = yield call(serverAuth, userFirebaseObj);
 
+          //load qr code from local storage
+          let qrCode = yield loadData(savedName.qrCode);
+
+          //add qr code to userServerObj
+          userServerObj.qrCode = qrCode;
+
+          //create user obj to send to store
           const user = { userFirebaseObj, userServerObj };
           //send user object and unsub func to store
           yield put(signinSuccess(user, unsubscribe));

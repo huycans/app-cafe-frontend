@@ -7,7 +7,13 @@ import {
   fork,
   all
 } from "redux-saga/effects";
-import { SIGNIN_SUCCESS, signinFailure, signinSuccess } from "../actions/auth";
+import {
+  SIGNIN_SUCCESS,
+  signinFailure,
+  signinSuccess,
+  FETCH_QR_CODE,
+  FETCH_QR_CODE_SUCCESS
+} from "../actions/auth";
 
 import {
   signinEmail,
@@ -29,22 +35,27 @@ export const signin = function* signin(action) {
       case "EMAIL":
         user = yield call(signinEmail, action.data.email, action.data.password);
         yield put(signinSuccess(user));
+        yield put({ type: FETCH_QR_CODE, userId: user.userServerObj.id });
+        yield take(FETCH_QR_CODE_SUCCESS);
         yield put(NavigationActions.reset(signinAction));
         break;
       case "FACEBOOK":
         user = yield call(signinFb);
         yield put(signinSuccess(user));
+        yield put({ type: FETCH_QR_CODE, userId: user.userServerObj.id });
+        yield take(FETCH_QR_CODE_SUCCESS);
         yield put(NavigationActions.reset(signinAction));
         break;
       case "GOOGLE":
         user = yield call(signinGoogle);
         yield put(signinSuccess(user));
+        yield put({ type: FETCH_QR_CODE, userId: user.userServerObj.id });
+        yield take(FETCH_QR_CODE_SUCCESS);
         yield put(NavigationActions.reset(signinAction));
         break;
       default:
         throw Error("Invalid method");
     }
-    console.log("signin user", user);
   } catch (errorMessage) {
     yield put(signinFailure(errorMessage));
   }

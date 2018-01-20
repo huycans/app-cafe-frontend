@@ -38,13 +38,13 @@ class App extends React.Component<PropType, void> {
   handleNetworkStatusChange: Function;
   constructor() {
     super();
-    this.state = {
-      // isSignedIn: null,
-      // hasLocalCache: false,
-      // isOnline: false,
-      // hasCheckNetworkStatus: false
-      // errorMessage: ""
-    };
+    // this.state = {
+    //   // isSignedIn: null,
+    //   // hasLocalCache: false,
+    //   // isOnline: false,
+    //   // hasCheckNetworkStatus: false
+    //   // errorMessage: ""
+    // };
   }
 
   componentWillMount() {
@@ -56,7 +56,6 @@ class App extends React.Component<PropType, void> {
     //if new error message is different than current one, display it
     if (nextProps.errorMessage !== this.props.errorMessage)
       this.props.alertWithType("error", "Error", nextProps.errorMessage);
-    
   }
 
   componentWillUnmount() {
@@ -66,7 +65,6 @@ class App extends React.Component<PropType, void> {
 
   render(): any {
     console.log("rendering");
-    // let Layout = Loading;
     const {
       isSignedIn,
       hasLocalCache,
@@ -74,7 +72,7 @@ class App extends React.Component<PropType, void> {
       signingIn,
       hasCheckNetworkStatus
     } = this.props;
-    const { errorMessage } = this.state;
+
     const NetworkErrorMsg = (): React.Node => (
       <View
         style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}
@@ -104,20 +102,8 @@ class App extends React.Component<PropType, void> {
 
     const NavigatorWithReduxNav = connect(mapStateToProps)(Navigator);
 
-    // //error message display
-    // if (errorMessage) {
-    //   this.props.alertWithType("error", "Error", errorMessage);
-    // }
-
-    //FIXME: doesn't work
-    console.log("signingIn", signingIn);
     if (signingIn) return <Loading />;
-    return (
-      //isSignedIn is used in case if the user has outdated local cache
-      //and authorization with firebase failed than return to signinandup screen
-      // <NavigatorWithReduxNav screenProps={{ isSignedIn: isSignedIn }} />
-      <NavigatorWithReduxNav />
-    );
+    return <NavigatorWithReduxNav />;
   }
 }
 
