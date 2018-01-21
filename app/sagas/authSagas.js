@@ -56,7 +56,7 @@ const checkLocalCache = function* checkLocalCache() {
 const unsubscribe = function* unsubscribe() {
   yield take(UNSUBSCRIBE);
   console.log("Unsubscribing");
-  let firbaseUnsub = select(state => state.auth.firebaseUnsubscribe);
+  let firbaseUnsub = select(state => state.reducer.firebaseUnsubscribe);
   if (firbaseUnsub) firbaseUnsub();
 };
 
@@ -69,7 +69,7 @@ const startupSigninFlow = function* startupSigninFlow() {
     yield put({ type: CHECK_NETWORK_STATUS });
     yield take(HAS_CHECK_NETWORK_STATUS);
     try {
-      let netStat = yield select(state => state.auth.isOnline);
+      let netStat = yield select(state => state.reducer.isOnline);
       if (netStat) {
         let userFirebaseObj;
         //set up a listener channel for firebase.auth.onAuthStateChangedyie
@@ -120,7 +120,7 @@ const startupSigninFlow = function* startupSigninFlow() {
         yield call(checkLocalCache);
         yield take(CACHE_CHECKED);
 
-        let hasLocalCache = select(state => state.auth.hasLocalCache);
+        let hasLocalCache = select(state => state.reducer.hasLocalCache);
         yield put(signinFailure("No Internet connection"));
         if (hasLocalCache) {
           //if local cache exist, navigate to MainDrawerStack

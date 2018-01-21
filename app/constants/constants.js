@@ -1,11 +1,13 @@
 //constants for api access
-const PROTOCOL = "https://";
+const PROTOCOL = "http://";
 // const PROTOCOL = "http://";
 // const SERVER_IP = "192.168.137.1:8080";
-const SERVER_IP = "morning-headland-89461.herokuapp.com";
+const SERVER_IP = "35.229.49.111:5003";
+// const SERVER_IP = "morning-headland-89461.herokuapp.com";
 const SERVER_LINK = "/ebolo-app-cafe/rest-api";
 const SERVER_API = {
   auth: "/auth",
+  feedfb: "/feed/fb",
   feed: "/feed",
   userinfo: "/user/info"
 };

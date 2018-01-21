@@ -1,5 +1,11 @@
-import { call, put } from "redux-saga/effects";
-import { signinFailure, signinSuccess, SIGNING_IN } from "../actions/auth";
+import { call, put, take } from "redux-saga/effects";
+import {
+  signinFailure,
+  signinSuccess,
+  SIGNING_IN,
+  FETCH_QR_CODE_REQUEST,
+  FETCH_QR_CODE_SUCCESS
+} from "../actions/auth";
 import { signupEmail } from "../components/FirebaseAuth/AuthFunctions";
 import { NavigationActions } from "react-navigation";
 
@@ -11,7 +17,11 @@ export const signupSaga = function* signupSaga(action) {
     if (user === "none") {
       yield put(signinFailure("No user is signed in"));
       return;
-    } else yield put(signinSuccess(user));
+    } else {
+      yield put(signinSuccess(user));
+      yield put({ type: FETCH_QR_CODE_REQUEST, userId: user.userServerObj.id });
+      yield take(FETCH_QR_CODE_SUCCESS);
+    }
 
     yield put(
       NavigationActions.reset({

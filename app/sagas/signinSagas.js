@@ -11,7 +11,7 @@ import {
   SIGNIN_SUCCESS,
   signinFailure,
   signinSuccess,
-  FETCH_QR_CODE,
+  FETCH_QR_CODE_REQUEST,
   FETCH_QR_CODE_SUCCESS
 } from "../actions/auth";
 
@@ -35,28 +35,37 @@ export const signin = function* signin(action) {
       case "EMAIL":
         user = yield call(signinEmail, action.data.email, action.data.password);
         yield put(signinSuccess(user));
-        yield put({ type: FETCH_QR_CODE, userId: user.userServerObj.id });
+        yield put({
+          type: FETCH_QR_CODE_REQUEST,
+          userId: user.userServerObj.id
+        });
         yield take(FETCH_QR_CODE_SUCCESS);
         yield put(NavigationActions.reset(signinAction));
         break;
       case "FACEBOOK":
         user = yield call(signinFb);
         yield put(signinSuccess(user));
-        yield put({ type: FETCH_QR_CODE, userId: user.userServerObj.id });
+        yield put({
+          type: FETCH_QR_CODE_REQUEST,
+          userId: user.userServerObj.id
+        });
         yield take(FETCH_QR_CODE_SUCCESS);
         yield put(NavigationActions.reset(signinAction));
         break;
       case "GOOGLE":
         user = yield call(signinGoogle);
         yield put(signinSuccess(user));
-        yield put({ type: FETCH_QR_CODE, userId: user.userServerObj.id });
+        yield put({
+          type: FETCH_QR_CODE_REQUEST,
+          userId: user.userServerObj.id
+        });
         yield take(FETCH_QR_CODE_SUCCESS);
         yield put(NavigationActions.reset(signinAction));
         break;
       default:
         throw Error("Invalid method");
     }
-  } catch (errorMessage) {
-    yield put(signinFailure(errorMessage));
+  } catch (error) {
+    yield put(signinFailure(error.message));
   }
 };

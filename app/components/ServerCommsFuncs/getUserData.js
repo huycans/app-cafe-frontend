@@ -19,7 +19,7 @@ async function getUserData(
     return userData.content;
   } catch (error) {
     console.log("get user data error: ", error);
-    throw error.message;
+    throw error;
   }
 }
 export default getUserData;

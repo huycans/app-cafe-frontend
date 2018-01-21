@@ -36,6 +36,7 @@ async function secureConnect(
     }
   } catch (error) {
     console.log("Error when securely connect to server: ", error);
+    throw error;
   }
 }
 export default secureConnect;

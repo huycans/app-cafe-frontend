@@ -64,9 +64,13 @@ export const saveCache = (key, data) => ({
   data
 });
 
-export const FETCH_QR_CODE = "FETCH_QR_CODE";
+export const FETCH_QR_CODE_REQUEST = "FETCH_QR_CODE_REQUEST";
 export const FETCH_QR_CODE_SUCCESS = "FETCH_QR_CODE_SUCCESS";
 export const FETCH_QR_CODE_FAILURE = "FETCH_QR_CODE_FAILURE";
+
+export const FETCH_FB_FEED_REQUEST = "FETCH_FB_FEED_REQUEST";
+export const FETCH_FB_FEED_SUCCESS = "FETCH_FB_FEED_SUCCESS";
+export const FETCH_FB_FEED_FAILURE = "FETCH_FB_FEED_FAILURE";
 
 export const SIGNOUT_REQUEST = "SIGNOUT_REQUEST";
 export const signoutRequest = () => ({

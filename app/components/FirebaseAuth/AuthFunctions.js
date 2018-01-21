@@ -70,7 +70,7 @@ async function serverAuth(currentUser: {
     return userServerObj;
   } catch (error) {
     console.log("Error while auth with server: ", error);
-    throw error.message;
+    throw error;
   }
 }
 
@@ -111,7 +111,7 @@ async function signinFb(): Promise<Object> {
     }
   } catch (error) {
     console.log(`Login with FB fail with error: ${error}`);
-    throw error.message;
+    throw error;
   }
 }
 
@@ -128,7 +128,7 @@ async function signinFb(): Promise<Object> {
     });
   } catch (err) {
     console.log("Play services error", err.code, err.message);
-    throw err.message;
+    throw err;
   }
 })();
 
@@ -155,8 +155,8 @@ async function signinGoogle(): Promise<Object> {
   } catch (error) {
     // var errorCode = error.code;
     var errorMessage = error.message;
-    console.log("error when signing in with google", errorMessage);
-    throw errorMessage;
+    console.log("Error when signing in with google", errorMessage);
+    throw error;
   }
 }
 
@@ -182,8 +182,8 @@ async function signupEmail(email: string, password: string): Promise<Object> {
     // Handle Errors here.
     var errorCode = error.code;
     var errorMessage = error.message;
-
-    throw errorMessage;
+    console.log("Signup error ", errorMessage);
+    throw error;
   }
 }
 
@@ -200,8 +200,8 @@ async function signinEmail(email: string, pass: string): Promise<Object> {
     var errorCode = error.code;
     var errorMessage = error.message;
 
-    console.log(errorCode, errorMessage);
-    throw errorMessage;
+    console.log("Sign in with email failed with error ", errorMessage);
+    throw error;
   }
 }
 
@@ -215,8 +215,8 @@ async function signout(): Promise<void> {
   } catch (error) {
     // var errorCode = error.code;
     var errorMessage = error.message;
-    console.log(errorMessage);
-    throw errorMessage;
+    console.log("Signout failed with error ", errorMessage);
+    throw error;
   }
 }
 

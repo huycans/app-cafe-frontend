@@ -115,7 +115,7 @@ const mapStateToProps = (state: Object): Object => {
     hasCheckNetworkStatus,
     errorMessage,
     signingIn
-  } = state.auth;
+  } = state.reducer;
   return {
     isSignedIn,
     hasLocalCache,

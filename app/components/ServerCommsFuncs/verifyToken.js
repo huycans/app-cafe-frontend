@@ -31,6 +31,7 @@ async function verifyToken(
     }
   } catch (error) {
     console.log("Verifying token error", error);
+    throw error;
   }
 }
 export default verifyToken;

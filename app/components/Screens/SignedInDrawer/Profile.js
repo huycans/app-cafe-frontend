@@ -80,7 +80,6 @@ class Profile extends React.Component<PropType, StateType> {
       if (userInfo.avatarUrl) userAvatar = { uri: userInfo.avatarUrl };
       //link to QR code
       let qrCodeLink = URL + userInfo.qrCode;
-      console.log(qrCodeLink);
 
       ScreenContent = (): React.Node => (
         <Container>
@@ -214,8 +213,8 @@ class Profile extends React.Component<PropType, StateType> {
 
 const mapStateToProps = (state: Object): Object => {
   return {
-    isSignedIn: state.auth.isSignedIn,
-    userServerObj: state.auth.userServerObj
+    isSignedIn: state.reducer.isSignedIn,
+    userServerObj: state.reducer.userServerObj
   };
 };
 

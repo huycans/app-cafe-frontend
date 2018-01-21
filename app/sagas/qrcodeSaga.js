@@ -8,7 +8,7 @@ import { URL, SERVER_API, savedName } from "../constants/constants";
 import { storeData } from "../components/Storage/Storage";
 /**
  * how qr code is fetch:
- * when user signing in for the first time, a FETCH_QR_CODE action is sent
+ * when user signing in for the first time, a FETCH_QR_CODE_REQUEST action is sent
  * when qr code arrives, it will be appended to userServerObj in store and saved in local storage
  * next time user automatic signin, qr code will be loaded from local storage
  */
@@ -33,7 +33,7 @@ async function fetchQR(userId: string): Promise<string> {
     }
   } catch (error) {
     console.log("Fetch qr failed", error);
-    throw error.message;
+    throw error;
   }
 }
 
@@ -43,8 +43,8 @@ const fetchQRCode = function* fetchQRCode(action: Object): void {
     yield put({ type: FETCH_QR_CODE_SUCCESS, qrString });
     //store locally, for future uses
     storeData(savedName.qrCode, qrString);
-  } catch (errorMessage) {
-    yield put({ type: FETCH_QR_CODE_FAILURE, errorMessage });
+  } catch (error) {
+    yield put({ type: FETCH_QR_CODE_FAILURE, errorMessage: error.message });
   }
 };
 

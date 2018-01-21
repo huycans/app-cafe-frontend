@@ -1,20 +1,15 @@
 import {
-  CHECK_NETWORK_STATUS,
-  CHECK_LOCAL_CACHE,
-  CHECK_SIGNIN_REQUEST,
   HAS_CHECK_NETWORK_STATUS,
-  CHECK_SIGNIN_RESULT,
   SIGNIN_SUCCESS,
   SIGNIN_FAILURE,
-  FIREBASE_UNSUBSCRIBE_FUNCTION_RECIEVED,
-  NETWORK_STATUS_CHANGE,
   CACHE_CHECKED,
   SIGNIN_REQUEST,
   FETCH_QR_CODE_SUCCESS,
   FETCH_QR_CODE_FAILURE,
-  FETCH_QR_CODE
+  FETCH_QR_CODE_REQUEST,
+  FETCH_FB_FEED_SUCCESS,
+  FETCH_FB_FEED_FAILURE
 } from "../actions/auth";
-import { fetchQRCode } from "../sagas/qrcodeSaga";
 
 const initialState = {
   isSignedIn: null,
@@ -25,10 +20,12 @@ const initialState = {
   firebaseUnsubscribe: null,
   errorMessage: "",
   userFirebaseObj: {}, //the user object recieved from firebase
-  userServerObj: {} //the user object received from server
+  userServerObj: {}, //the user object received from server
+  fbFeed: [],
+  adminFeed: []
 };
 
-const auth = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case HAS_CHECK_NETWORK_STATUS:
       return {
@@ -77,7 +74,7 @@ const auth = (state = initialState, action) => {
           ...state,
           hasLocalCache: false
         };
-    case FETCH_QR_CODE:
+    case FETCH_QR_CODE_REQUEST:
       return {
         ...state,
         signingIn: true
@@ -97,9 +94,19 @@ const auth = (state = initialState, action) => {
         signingIn: false,
         errorMessage: "Failed to load QR code, please reload the app"
       };
+    case FETCH_FB_FEED_SUCCESS:
+      return {
+        ...state,
+        fbFeed: action.fbFeed
+      };
+    case FETCH_FB_FEED_FAILURE:
+      return {
+        ...state,
+        errorMessage: action.errorMessage
+      };
     default:
       return state;
   }
 };
 
-export default auth;
+export default reducer;
