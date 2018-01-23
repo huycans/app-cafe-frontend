@@ -60,18 +60,6 @@ class FBFeed extends React.Component<PropType, StateType> {
     this.setModalVisible = this.setModalVisible.bind(this);
   }
 
-  //   componentDidMount() {
-  //     var self = this; //do this so that setstate in callback below can see "this"
-  //     this.getFBFeed().then(
-  //       function(newsfeed: Array<FbfeedType>) {
-  //         self.setState({ feedData: newsfeed, hasFBFeed: true });
-  //       },
-  //       function(error: Error) {
-  //         console.log(error);
-  //       }
-  //     );
-  //   }
-
   componentDidMount() {
     if (this.props.fbFeed.length === 0)
       this.props.dispatch({ type: FETCH_FB_FEED_REQUEST });

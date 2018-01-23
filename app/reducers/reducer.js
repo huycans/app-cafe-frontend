@@ -8,7 +8,9 @@ import {
   FETCH_QR_CODE_FAILURE,
   FETCH_QR_CODE_REQUEST,
   FETCH_FB_FEED_SUCCESS,
-  FETCH_FB_FEED_FAILURE
+  FETCH_FB_FEED_FAILURE,
+  FETCH_ADMIN_FEED_FAILURE,
+  FETCH_ADMIN_FEED_SUCCESS
 } from "../actions/auth";
 
 const initialState = {
@@ -99,6 +101,12 @@ const reducer = (state = initialState, action) => {
         ...state,
         fbFeed: action.fbFeed
       };
+    case FETCH_ADMIN_FEED_SUCCESS:
+      return {
+        ...state,
+        adminFeed: action.adminFeed
+      };
+    case FETCH_ADMIN_FEED_FAILURE:
     case FETCH_FB_FEED_FAILURE:
       return {
         ...state,

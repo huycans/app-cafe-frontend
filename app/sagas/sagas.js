@@ -14,7 +14,8 @@ import {
   SIGNOUT_REQUEST,
   SIGNUP_REQUEST,
   FETCH_QR_CODE_REQUEST,
-  FETCH_FB_FEED_REQUEST
+  FETCH_FB_FEED_REQUEST,
+  FETCH_ADMIN_FEED_REQUEST
 } from "../actions/auth";
 import { checkNetworkStatus, watchOnNetworkStatusChange } from "./netStatSagas";
 import { startupSigninFlow, unsubscribe } from "./authSagas";
@@ -22,7 +23,7 @@ import { signin } from "./signinSagas";
 import { signupSaga } from "./signupSaga";
 import { signoutSaga } from "./signoutSaga";
 import { fetchQRCode } from "./qrcodeSaga";
-import { fbfeed } from "./newfeedSaga";
+import { fbfeed, adminfeed } from "./newfeedSaga";
 
 const rootSaga = function* rootSaga() {
   yield all([
@@ -32,6 +33,7 @@ const rootSaga = function* rootSaga() {
     takeLatest(SIGNUP_REQUEST, signupSaga),
     takeLatest(FETCH_QR_CODE_REQUEST, fetchQRCode),
     takeLatest(FETCH_FB_FEED_REQUEST, fbfeed),
+    takeLatest(FETCH_ADMIN_FEED_REQUEST, adminfeed),
     fork(watchOnNetworkStatusChange),
     fork(startupSigninFlow),
     fork(unsubscribe)

@@ -1,6 +1,13 @@
 //@flow
 import * as React from "react";
-import { Image, Modal, View, ScrollView } from "react-native";
+import {
+  Image,
+  Modal,
+  View,
+  ScrollView,
+  WebView,
+  Dimensions
+} from "react-native";
 import {
   Container,
   Content,
@@ -17,6 +24,8 @@ import { URL, SERVER_API } from "../../../../constants/constants";
 import Loading from "../../../Loading/Loading";
 import * as MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { modalStyles } from "./styles";
+import { FETCH_ADMIN_FEED_REQUEST } from "../../../../actions/auth";
+import { connect } from "react-redux";
 
 const TODAY = new Date();
 const formatTime = (time: Object): string => {
@@ -25,7 +34,8 @@ const formatTime = (time: Object): string => {
 };
 
 type PropType = {
-  dispatch: Function
+  dispatch: Function,
+  adminFeed: Array<AdminFeedType>
 };
 
 type PostStateType = {
@@ -35,78 +45,45 @@ type PostStateType = {
   selectedPost: ?Object
 };
 
-const data = [
-  {
-    created_time: "1/1/2011",
-    full_picture:
-      "https://facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-art.png",
-    id: "232rfrgf4r4ggrg",
-    link: "23rgefgrhrhwwbbbb",
-    message:
-      "This is message This is message This is message This is message This is message This is message This is message This is message This is message This is message This is message This is message ",
-    source: "source"
-  },
-  {
-    created_time: "1/1/2011",
-    full_picture:
-      "https://facebookbrand.com/wp-content/themes/fb-branding/prj-fb-branding/assets/images/fb-art.png",
-    id: "232rfrgf4r4ggrg",
-    link: "23rgefgrhrhwwbbbb",
-    message:
-      "This is message This is message This is message This is message This is message This is message This is message This is message This is message This is message This is message This is message ",
-    source: "source"
-  }
-];
+type AdminFeedType = {
+  id: string,
+  createdTime: string,
+  lastModifiedTime: string,
+  content: string,
+  banner: string,
+  title: string
+};
+
 //feed taken from admin app's post
-export default class AdminPost extends React.Component<
-  PropType,
-  PostStateType
-> {
-  getPost: Function;
+class AdminPost extends React.Component<PropType, PostStateType> {
   setModalVisible: Function;
   constructor(props: any) {
     super(props);
     this.state = {
       hasAdminFeed: true,
-      feedData: data,
+      feedData: [],
       modalVisible: false,
       selectedPost: null
     };
-    this.getPost = this.getPost.bind(this);
     this.setModalVisible = this.setModalVisible.bind(this);
-  }
-  async getPost(): Promise<any> {
-    // try {
-    //   console.log("getting newsfeed");
-    //   let link = URL + SERVER_API.feed;
-    //   let newsfeed = await fetch(link, {
-    //     method: "GET",
-    //     headers: {
-    //       Accept: "application/json",
-    //       "Content-Type": "application/json"
-    //     }
-    //   });
-    //   let newsfeedJSON = await newsfeed.json();
-    //   return newsfeedJSON.content.data;
-    // } catch (error) {
-    //   console.log("Retrieving newsfeed error: ", error);
-    // }
-    console.log("getting");
   }
 
   componentDidMount() {
-    // var self = this; //do this so that setstate in callback below can see "this"
-    // this.getPost().then(
-    //   function(newsfeed: Array<FBFeedDataType>) {
-    //     console.log(newsfeed);
-    //     //storeData(savedName.newsfeed, newsfeed);
-    //     self.setState({ feedData: newsfeed, hasAdminFeed: true });
-    //   },
-    //   function(error: Error) {
-    //     console.log(error);
-    //   }
-    // );
-    console.log("mounted");
+    if (this.props.adminFeed.length === 0)
+      //if the adminFeed array from the store is currently empty, send a request to fetch it
+      this.props.dispatch({ type: FETCH_ADMIN_FEED_REQUEST });
+    else
+      //else put the array in this component state, this help avoid re-fetching the array
+      this.setState({ feedData: this.props.adminFeed, hasAdminFeed: true });
+  }
+
+  componentWillReceiveProps(nextProps: Object) {
+    if (
+      nextProps.fbFeed !== this.props.adminFeed &&
+      nextProps.adminFeed !== []
+    ) {
+      this.setState({ feedData: nextProps.adminFeed, hasAdminFeed: true });
+    }
   }
 
   setModalVisible(visible: boolean, post: Object) {
@@ -119,6 +96,7 @@ export default class AdminPost extends React.Component<
   render(): React.Node {
     let { hasAdminFeed, feedData, selectedPost } = this.state;
     let Display = null;
+    let screenWidth = Dimensions.get("window").width;
     if (!hasAdminFeed) {
       Display = Loading;
     } else {
@@ -126,8 +104,8 @@ export default class AdminPost extends React.Component<
         <List
           dataArray={feedData}
           renderRow={(rowData: Object): React.Node => {
-            let messageDigest = rowData.message.slice(0, 100) + " ... ";
-            let d = new Date(rowData.created_time);
+            // let messageDigest = rowData.message.slice(0, 100) + " ... ";
+            let d = new Date(rowData.createdTime);
             let formattedDate = formatTime(d);
             return (
               <ListItem
@@ -145,7 +123,7 @@ export default class AdminPost extends React.Component<
                   <CardItem>
                     <Thumbnail
                       style={{ flex: 1, height: 200 }}
-                      source={require("../../../../img/yama.png")}
+                      source={{ uri: rowData.banner }}
                       square
                       large
                     />
@@ -156,7 +134,7 @@ export default class AdminPost extends React.Component<
                     onPress={(): void => this.setModalVisible(true, rowData)}
                   >
                     <Text style={{ textAlign: "left", margin: 10 }}>
-                      {messageDigest}
+                      {rowData.title}
                     </Text>
                   </CardItem>
                   <CardItem
@@ -184,12 +162,21 @@ export default class AdminPost extends React.Component<
       );
     }
     //TODO: change FBFeedDataType
-    const ModalCard = (props: { selectedPost: FBFeedDataType }): React.Node =>
+    const ModalCard = (props: { selectedPost: AdminFeedType }): React.Node =>
       !props.selectedPost ? (
         <View />
       ) : (
         //replace card with scrollview
-        <ScrollView style={modalStyles.contentContainer}>
+        <View
+          style={[
+            modalStyles.contentContainer,
+            {
+              flex: 1,
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }
+          ]}
+        >
           <MaterialIcons.Button
             name="arrow-back"
             borderRadius={5}
@@ -209,17 +196,25 @@ export default class AdminPost extends React.Component<
           <Image
             style={{
               marginTop: 10,
-              height: 200,
-              width: 400,
+              flex: 1,
+              width: screenWidth - 50,
               alignSelf: "center"
             }}
-            source={{ uri: selectedPost.full_picture }}
+            resizeMode="contain"
+            source={{ uri: selectedPost.banner }}
           />
 
-          <Text style={{ textAlign: "auto", marginBottom: 15, marginTop: 15 }}>
-            {selectedPost.message}
-          </Text>
-        </ScrollView>
+          <WebView
+            style={{
+              alignSelf: "center",
+              marginBottom: 15,
+              marginTop: 15,
+              width: screenWidth - 50,
+              flex: 3
+            }}
+            source={{ html: selectedPost.content }}
+          />
+        </View>
       );
     return (
       <Container>
@@ -243,3 +238,10 @@ export default class AdminPost extends React.Component<
     );
   }
 }
+
+const mapStateToProps = (state: Object): Object => {
+  const { adminFeed } = state.reducer;
+  return { adminFeed };
+};
+
+export default connect(mapStateToProps)(AdminPost);

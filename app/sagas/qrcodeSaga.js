@@ -4,7 +4,7 @@
 
 import { call, put } from "redux-saga/effects";
 import { FETCH_QR_CODE_SUCCESS, FETCH_QR_CODE_FAILURE } from "../actions/auth";
-import { URL, SERVER_API, savedName } from "../constants/constants";
+import { URL, SERVER_API, savedName, timePeriod } from "../constants/constants";
 import { storeData } from "../components/Storage/Storage";
 /**
  * how qr code is fetch:
@@ -42,7 +42,7 @@ const fetchQRCode = function* fetchQRCode(action: Object): void {
     let qrString = yield call(fetchQR, action.userId);
     yield put({ type: FETCH_QR_CODE_SUCCESS, qrString });
     //store locally, for future uses
-    storeData(savedName.qrCode, qrString);
+    storeData(savedName.qrCode, qrString, timePeriod.oneMonth);
   } catch (error) {
     yield put({ type: FETCH_QR_CODE_FAILURE, errorMessage: error.message });
   }
