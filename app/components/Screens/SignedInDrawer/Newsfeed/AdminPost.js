@@ -101,6 +101,7 @@ class AdminPost extends React.Component<PropType, PostStateType> {
     if (!hasAdminFeed) {
       Display = Loading;
     } else {
+      console.log(feedData);
       Display = (): React.Node => (
         <List
           dataArray={feedData}
@@ -194,17 +195,6 @@ class AdminPost extends React.Component<PropType, PostStateType> {
             <Text>Go Back</Text>
           </MaterialIcons.Button>
 
-          <Image
-            style={{
-              marginTop: 10,
-              height: screenHeight * 0.25,
-              width: screenWidth - 50,
-              alignSelf: "center"
-            }}
-            resizeMode="contain"
-            source={{ uri: selectedPost.banner }}
-          />
-
           <WebView
             style={{
               alignSelf: "center",
@@ -213,7 +203,13 @@ class AdminPost extends React.Component<PropType, PostStateType> {
               width: screenWidth - 50,
               flex: 1
             }}
-            source={{ html: selectedPost.content }}
+            source={{
+              html: `<img alt="Banner" src="${
+                selectedPost.banner
+              }" style="width:${screenWidth - 60}px;height:${screenHeight *
+                0.25}px;">
+              ${selectedPost.content}`
+            }}
           />
         </View>
       );
