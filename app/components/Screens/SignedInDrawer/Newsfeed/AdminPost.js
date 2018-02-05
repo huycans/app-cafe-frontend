@@ -97,6 +97,7 @@ class AdminPost extends React.Component<PropType, PostStateType> {
     let { hasAdminFeed, feedData, selectedPost } = this.state;
     let Display = null;
     let screenWidth = Dimensions.get("window").width;
+    let screenHeight = Dimensions.get("window").height;
     if (!hasAdminFeed) {
       Display = Loading;
     } else {
@@ -196,7 +197,7 @@ class AdminPost extends React.Component<PropType, PostStateType> {
           <Image
             style={{
               marginTop: 10,
-              flex: 1,
+              height: screenHeight * 0.25,
               width: screenWidth - 50,
               alignSelf: "center"
             }}
@@ -210,7 +211,7 @@ class AdminPost extends React.Component<PropType, PostStateType> {
               marginBottom: 15,
               marginTop: 15,
               width: screenWidth - 50,
-              flex: 3
+              flex: 1
             }}
             source={{ html: selectedPost.content }}
           />

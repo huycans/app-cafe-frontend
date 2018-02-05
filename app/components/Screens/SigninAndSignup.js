@@ -54,7 +54,7 @@ class SigninAndSignup extends Component<PropType, StateType> {
         <View
           style={{
             flex: 0.5,
-            marginTop: 250,
+            marginTop: 200,
             backgroundColor: "white",
             borderRadius: 6,
             padding: 10
@@ -90,7 +90,7 @@ class SigninAndSignup extends Component<PropType, StateType> {
             activeOpacity={0.5}
             disabled={email === "" || password === "" || false}
           >
-            <Text style={styles.baseText}>Sign in</Text>
+            <Text style={styles.baseText}>Đăng nhập</Text>
           </TouchableHighlight>
         </View>
 
@@ -139,7 +139,7 @@ class SigninAndSignup extends Component<PropType, StateType> {
             underlayColor="transparent"
             activeOpacity={0.5}
           >
-            <Text style={styles.smallText}>Don't have an account?</Text>
+            <Text style={styles.smallText}>Không có tài khoản?</Text>
           </TouchableHighlight>
 
           <TouchableHighlight
@@ -148,7 +148,7 @@ class SigninAndSignup extends Component<PropType, StateType> {
             underlayColor="transparent"
             activeOpacity={0.5}
           >
-            <Text style={styles.smallText}>Forgot password?</Text>
+            <Text style={styles.smallText}>Quên mật khẩu?</Text>
           </TouchableHighlight>
         </View>
       </Image>

@@ -72,7 +72,7 @@ class EmailSignup extends Component<PropType, StateType> {
         <View
           style={{
             flex: 0.6,
-            marginTop: 250,
+            marginTop: 150,
             borderRadius: 6,
             padding: 10
           }}
@@ -110,7 +110,7 @@ class EmailSignup extends Component<PropType, StateType> {
               activeOpacity={0.5}
             >
               <Text style={[styles.baseText, { fontSize: baseFontSize + 8 }]}>
-                Sign up
+                Đăng ký
               </Text>
             </TouchableHighlight>
 
@@ -130,7 +130,7 @@ class EmailSignup extends Component<PropType, StateType> {
               activeOpacity={0.5}
             >
               <Text style={[styles.baseText, { fontSize: baseFontSize + 8 }]}>
-                Go back
+                Quay lại
               </Text>
             </TouchableHighlight>
           </View>
