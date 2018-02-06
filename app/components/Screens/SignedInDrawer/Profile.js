@@ -1,9 +1,7 @@
 //@flow
 import * as React from "react";
 import { View } from "react-native";
-import { NavigationActions } from "react-navigation";
 import { Image } from "react-native";
-import { savedName, SERVER_API } from "../../../constants/constants";
 import * as Progress from "react-native-progress";
 import {
   Container,
@@ -22,6 +20,8 @@ import Loading from "../../Loading/Loading";
 import { connect } from "react-redux";
 import { signoutRequest } from "../../../actions/auth";
 import { URL } from "../../../constants/constants";
+import EStyleSheet from "react-native-extended-stylesheet";
+
 const iconSize = 22;
 
 type PropType = {
@@ -38,9 +38,6 @@ class Profile extends React.Component<PropType, StateType> {
   getUserData: Function;
   constructor(props: PropType) {
     super(props);
-    // this.state = {
-    //   userInfo: null
-    // };
   }
 
   componentDidMount() {
@@ -49,31 +46,17 @@ class Profile extends React.Component<PropType, StateType> {
       if (this.props.isSignedIn === false) {
         this.props.dispatch(signoutRequest());
       }
-      // else {
-      // var self = this;
-      // loadData(savedName.userInfoData).then(
-      //   function(userInfo: Object) {
-      //     console.log("userInfo: ", userInfo);
-      //     self.forceUpdate(self.setState({ userInfo: userInfo }));
-      //   },
-      //   function(error: Error) {
-      //     console.log(error);
-      //   }
-      // );
-
-      //if everything is okay
-      // pass the userServerObj to state
-      // this.forceUpdate(this.setState({ userInfo: this.props.userServerObj }));
-      // }
     }, 500);
   }
 
   render(): React.Node {
     const userInfo = this.props.userServerObj;
+
+    //set default screen content to the loading component first
     let ScreenContent = (): React.Node => <Loading />;
-    //TODO: change this so it wait for qrcode (userinfo.qrcode)
-    //maybe remove state
+
     if (userInfo.qrCode != undefined) {
+      //if qrCode link had been retrieved
       //default avatar
       let userAvatar = require("../../../img/ic_launcher.png");
       //if user's avatar exist, assign it to userAvatar
@@ -86,105 +69,49 @@ class Profile extends React.Component<PropType, StateType> {
           <Content>
             <Card>
               <CardItem cardBody>
-                <View style={{ flex: 1, alignItems: "center" }}>
-                  <View
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      backgroundColor: "#000"
-                    }}
-                  >
-                    <Image
-                      source={userAvatar}
-                      style={{
-                        height: 200,
-                        width: null,
-                        flex: 1,
-                        opacity: 0.5
-                      }}
-                    />
+                <View style={styles.profileContainer}>
+                  <View style={styles.backgroundImgContainer}>
+                    <Image source={userAvatar} style={styles.backgroundImg} />
                   </View>
+
                   <Thumbnail
-                    style={{ marginTop: "10%" }}
+                    style={styles.backgroundImgThumbnail}
                     source={userAvatar}
                     large
                   />
-                  <Text
-                    style={{
-                      fontSize: 20,
-                      marginTop: "auto",
-                      textAlign: "center",
-                      color: "white"
-                    }}
-                  >
-                    {userInfo.username}
-                  </Text>
-                  <Text note style={[{ color: "white" }]}>
+                  <Text style={styles.usernameText}>{userInfo.username}</Text>
+                  <Text note style={styles.currentMembershipLevelText}>
                     chưa có mức thành viên
                   </Text>
-                  <Text note style={[{ color: "yellow" }]}>
+                  <Text note style={styles.pointText}>
                     {userInfo.point + " điểm"}
                   </Text>
                 </View>
               </CardItem>
-              <CardItem style={{ flex: 1 }}>
+
+              <CardItem style={styles.container}>
                 <Progress.Bar
                   style={{ flex: 1 }}
                   width={null}
                   height={6}
                   progress={userInfo.point / 100}
-                  color="#FCD836"
+                  color={styles.$progBarColor}
                   useNativeDriver={true}
                 />
               </CardItem>
-              <CardItem style={{ flex: 1 }}>
-                <Body
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    justifyContent: "space-between"
-                  }}
-                >
-                  <Text
-                    style={[
-                      { fontSize: 10, textAlign: "left", color: "black" }
-                    ]}
-                  >
-                    Thành viên mới
-                  </Text>
-                  <Text
-                    style={[
-                      { fontSize: 10, textAlign: "center", color: "black" }
-                    ]}
-                  >
-                    Buddy
-                  </Text>
-                  <Text
-                    style={[
-                      { fontSize: 10, textAlign: "right", color: "black" }
-                    ]}
-                  >
-                    You're my angel
-                  </Text>
+
+              <CardItem style={styles.container}>
+                <Body style={styles.membershipLevelContainer}>
+                  <Text style={styles.membershipLevelText}>Thành viên</Text>
+                  <Text style={styles.membershipLevelText}>Bạc</Text>
+                  <Text style={styles.membershipLevelText}>Vàng</Text>
+                  <Text style={styles.membershipLevelText}>Bạch kim</Text>
                 </Body>
               </CardItem>
             </Card>
-            <Card
-              style={{
-                flex: 1,
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
+            <Card style={styles.qrContainer}>
               <Text style={{ marginTop: 10 }}>Mã tích điểm</Text>
-              <Image
-                style={{ width: 200, height: 200, margin: 10 }}
-                source={{ uri: qrCodeLink }}
-              />
+              <Image style={styles.qrCode} source={{ uri: qrCodeLink }} />
             </Card>
           </Content>
           <Footer>
@@ -218,4 +145,45 @@ const mapStateToProps = (state: Object): Object => {
   };
 };
 
+const styles = EStyleSheet.create({
+  $progBarColor: "#FCD836",
+  container: { flex: 1 },
+  profileContainer: { flex: 1, alignItems: "center" },
+  backgroundImgContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#000"
+  },
+  backgroundImg: {
+    height: 200,
+    width: null,
+    flex: 1,
+    opacity: 0.5
+  },
+  backgroundImgThumbnail: { marginTop: "10%" },
+  usernameText: {
+    fontSize: 20,
+    marginTop: "auto",
+    textAlign: "center",
+    color: "white"
+  },
+  currentMembershipLevelText: { color: "white" },
+  pointText: { color: "yellow" },
+  membershipLevelContainer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  membershipLevelText: { fontSize: 12, color: "black" },
+  qrContainer: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  qrCode: { width: 200, height: 200, margin: 10 }
+});
 export default connect(mapStateToProps)(Profile);

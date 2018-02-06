@@ -7,17 +7,12 @@ import { Text, View } from "react-native";
 import { connect, Provider } from "react-redux";
 
 import MainStack from "./components/Screens/Screens";
-import { serverAuth } from "./components/FirebaseAuth/AuthFunctions";
-// import { savedName } from "./constants/constants";
 import { startupSigninRequest, unsubscribe } from "./actions/auth";
 import { addNavigationHelpers } from "react-navigation";
 import { AlertProvider, connectAlert } from "./components/Alert";
 import store from "./store/store";
 import Loading from "./components/Loading/Loading";
-
-// type StateType = {
-//   errorMessage: string
-// };
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 type PropType = {
   dispatch: (() => { type: string }) => any,
@@ -32,20 +27,9 @@ type PropType = {
 
 class App extends React.Component<PropType, void> {
   checkLocalCache: Function;
-  // checkNetworkStatus: Function;
   unsubscribe: ?Function;
   handleSignInCheck: Function;
   handleNetworkStatusChange: Function;
-  constructor() {
-    super();
-    // this.state = {
-    //   // isSignedIn: null,
-    //   // hasLocalCache: false,
-    //   // isOnline: false,
-    //   // hasCheckNetworkStatus: false
-    //   // errorMessage: ""
-    // };
-  }
 
   componentWillMount() {
     //start the startup signin request routine
@@ -127,6 +111,10 @@ const mapStateToProps = (state: Object): Object => {
 };
 
 const CafeApp = connect(mapStateToProps)(connectAlert(App));
+
+EStyleSheet.build({ // always call EStyleSheet.build() even if you don't use global variables!
+  
+});
 
 export default (): React.Node => (
   <Provider store={store}>

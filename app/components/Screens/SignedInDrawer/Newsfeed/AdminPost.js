@@ -1,13 +1,6 @@
 //@flow
 import * as React from "react";
-import {
-  Image,
-  Modal,
-  View,
-  ScrollView,
-  WebView,
-  Dimensions
-} from "react-native";
+import { Modal, View, WebView } from "react-native";
 import {
   Container,
   Content,
@@ -19,13 +12,13 @@ import {
   List,
   ListItem
 } from "native-base";
-import { URL, SERVER_API } from "../../../../constants/constants";
 
 import Loading from "../../../Loading/Loading";
 import * as MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { modalStyles } from "./styles";
 import { FETCH_ADMIN_FEED_REQUEST } from "../../../../actions/auth";
 import { connect } from "react-redux";
+import { styles } from "./styles";
 
 const TODAY = new Date();
 const formatTime = (time: Object): string => {
@@ -96,8 +89,8 @@ class AdminPost extends React.Component<PropType, PostStateType> {
   render(): React.Node {
     let { hasAdminFeed, feedData, selectedPost } = this.state;
     let Display = null;
-    let screenWidth = Dimensions.get("window").width;
-    let screenHeight = Dimensions.get("window").height;
+    let screenWidth = styles.$screenWidth;
+    let screenHeight = styles.screenHeight;
     if (!hasAdminFeed) {
       Display = Loading;
     } else {
@@ -110,21 +103,11 @@ class AdminPost extends React.Component<PropType, PostStateType> {
             let d = new Date(rowData.createdTime);
             let formattedDate = formatTime(d);
             return (
-              <ListItem
-                button
-                style={{
-                  width: "100%",
-                  marginLeft: 0,
-                  paddingLeft: 0,
-                  paddingRight: 0,
-                  marginRight: 0
-                  //backgroundColor: "transparent"
-                }}
-              >
+              <ListItem button style={styles.listContainer}>
                 <Card>
                   <CardItem>
                     <Thumbnail
-                      style={{ flex: 1, height: 200 }}
+                      style={styles.thumbnailImg}
                       source={{ uri: rowData.banner }}
                       square
                       large
@@ -135,23 +118,11 @@ class AdminPost extends React.Component<PropType, PostStateType> {
                     button
                     onPress={(): void => this.setModalVisible(true, rowData)}
                   >
-                    <Text style={{ textAlign: "left", margin: 10 }}>
-                      {rowData.title}
-                    </Text>
+                    <Text style={styles.previewText}>{rowData.title}</Text>
                   </CardItem>
-                  <CardItem
-                    footer
-                    style={{
-                      justifyContent: "flex-end"
-                    }}
-                  >
+                  <CardItem footer style={styles.footerStyle}>
                     <Right>
-                      <Text
-                        note
-                        style={{
-                          fontSize: 10
-                        }}
-                      >
+                      <Text note style={styles.dateText}>
                         {formattedDate}
                       </Text>
                     </Right>
@@ -168,17 +139,7 @@ class AdminPost extends React.Component<PropType, PostStateType> {
       !props.selectedPost ? (
         <View />
       ) : (
-        //replace card with scrollview
-        <View
-          style={[
-            modalStyles.contentContainer,
-            {
-              flex: 1,
-              flexDirection: "column",
-              justifyContent: "space-between"
-            }
-          ]}
-        >
+        <View style={styles.modalContainer}>
           <MaterialIcons.Button
             name="arrow-back"
             borderRadius={5}
@@ -196,13 +157,7 @@ class AdminPost extends React.Component<PropType, PostStateType> {
           </MaterialIcons.Button>
 
           <WebView
-            style={{
-              alignSelf: "center",
-              marginBottom: 15,
-              marginTop: 15,
-              width: screenWidth - 50,
-              flex: 1
-            }}
+            style={styles.WebView}
             source={{
               html: `<img alt="Banner" src="${
                 selectedPost.banner

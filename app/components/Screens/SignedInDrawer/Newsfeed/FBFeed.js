@@ -12,12 +12,12 @@ import {
   List,
   ListItem
 } from "native-base";
-import { URL, SERVER_API } from "../../../../constants/constants";
 import { connect } from "react-redux";
 import Loading from "../../../Loading/Loading";
 import * as MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { modalStyles } from "./styles";
 import { FETCH_FB_FEED_REQUEST } from "../../../../actions/auth";
+import { styles } from "./styles";
 
 const TODAY = new Date();
 const formatTime = (time: Object): string => {
@@ -93,21 +93,11 @@ class FBFeed extends React.Component<PropType, StateType> {
             let d = new Date(rowData.created_time);
             let formattedDate = formatTime(d);
             return (
-              <ListItem
-                button
-                style={{
-                  width: "100%",
-                  marginLeft: 0,
-                  paddingLeft: 0,
-                  paddingRight: 0,
-                  marginRight: 0
-                  //backgroundColor: "transparent"
-                }}
-              >
+              <ListItem button style={styles.listContainer}>
                 <Card>
                   <CardItem>
                     <Thumbnail
-                      style={{ flex: 1, height: 200 }}
+                      style={styles.thumbnailImg}
                       source={{ uri: rowData.full_picture }}
                       square
                       large
@@ -118,23 +108,11 @@ class FBFeed extends React.Component<PropType, StateType> {
                     button
                     onPress={(): void => this.setModalVisible(true, rowData)}
                   >
-                    <Text style={{ textAlign: "left", margin: 10 }}>
-                      {messageDigest}
-                    </Text>
+                    <Text style={styles.previewText}>{messageDigest}</Text>
                   </CardItem>
-                  <CardItem
-                    footer
-                    style={{
-                      justifyContent: "flex-end"
-                    }}
-                  >
+                  <CardItem footer style={styles.footerStyle}>
                     <Right>
-                      <Text
-                        note
-                        style={{
-                          fontSize: 10
-                        }}
-                      >
+                      <Text note style={styles.dateText}>
                         {formattedDate}
                       </Text>
                     </Right>
@@ -150,15 +128,14 @@ class FBFeed extends React.Component<PropType, StateType> {
       !props.selectedPost ? (
         <View />
       ) : (
-        //replace card with scrollview
-        <ScrollView style={modalStyles.contentContainer}>
+        <ScrollView style={styles.modalScrollview}>
           <MaterialIcons.Button
             name="arrow-back"
             borderRadius={5}
             backgroundColor="transparent"
             color="black"
             size={30}
-            underlayColor="#EBEBEB"
+            underlayColor={styles.$buttonUnderlayColor}
             activeOpacity={0.3}
             onPress={(): void =>
               this.setModalVisible(
@@ -171,18 +148,11 @@ class FBFeed extends React.Component<PropType, StateType> {
           </MaterialIcons.Button>
 
           <Image
-            style={{
-              marginTop: 10,
-              height: 200,
-              width: 400,
-              alignSelf: "center"
-            }}
+            style={styles.modalImg}
             source={{ uri: selectedPost.full_picture }}
           />
 
-          <Text style={{ textAlign: "auto", marginBottom: 15, marginTop: 15 }}>
-            {selectedPost.message}
-          </Text>
+          <Text style={styles.messageText}>{selectedPost.message}</Text>
         </ScrollView>
       );
     return (
