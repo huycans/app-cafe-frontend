@@ -28,5 +28,4 @@ const savedName = {
   qrCode: "qrCode"
 };
 
-const baseFontSize = 16;
-export { URL, SERVER_API, timePeriod, savedName, baseFontSize };
+export { URL, SERVER_API, timePeriod, savedName };

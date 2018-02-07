@@ -2,7 +2,7 @@
 import React, { Component } from "react";
 import { Text, View, TouchableHighlight, TextInput, Image } from "react-native";
 import styles from "./Styles.js";
-import { baseFontSize } from "../../constants/constants";
+import { baseFontSize } from "./Styles";
 import { connect } from "react-redux";
 import { signupRequest } from "../../actions/auth";
 type PropType = {
@@ -69,14 +69,7 @@ class EmailSignup extends Component<PropType, StateType> {
         source={require("../../img/signup_bg_vertical.png")}
         style={styles.container}
       >
-        <View
-          style={{
-            flex: 0.6,
-            marginTop: 150,
-            borderRadius: 6,
-            padding: 10
-          }}
-        >
+        <View style={styles.signupScreenCtn}>
           <TextInput
             autoCorrect={false}
             placeholder="email@email.com"
@@ -101,10 +94,7 @@ class EmailSignup extends Component<PropType, StateType> {
 
           <View style={{ marginTop: 20 }}>
             <TouchableHighlight
-              style={[
-                styles.button,
-                { backgroundColor: "#DCCC32", borderRadius: 20 }
-              ]}
+              style={[styles.button, styles.signupButton]}
               onPress={(): void => this.validateInput()}
               underlayColor="transparent"
               activeOpacity={0.5}
@@ -115,16 +105,7 @@ class EmailSignup extends Component<PropType, StateType> {
             </TouchableHighlight>
 
             <TouchableHighlight
-              style={[
-                styles.button,
-                {
-                  borderRadius: 20,
-                  backgroundColor: "transparent",
-                  borderWidth: 2,
-                  borderColor: "white",
-                  borderStyle: "solid"
-                }
-              ]}
+              style={[styles.button, styles.returnButton]}
               onPress={(): void => navigation.goBack()}
               underlayColor="transparent"
               activeOpacity={0.5}

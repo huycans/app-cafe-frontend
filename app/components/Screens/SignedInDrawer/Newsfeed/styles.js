@@ -5,8 +5,6 @@ const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
 const styles = EStyleSheet.create({
-  $screenWidth: screenWidth,
-  $screenHeight: screenHeight,
   $buttonUnderlayColor: "#EBEBEB",
   listContainer: {
     width: "100%",

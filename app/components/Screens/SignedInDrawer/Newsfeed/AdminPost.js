@@ -15,16 +15,10 @@ import {
 
 import Loading from "../../../Loading/Loading";
 import * as MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { modalStyles } from "./styles";
 import { FETCH_ADMIN_FEED_REQUEST } from "../../../../actions/auth";
 import { connect } from "react-redux";
 import { styles } from "./styles";
-
-const TODAY = new Date();
-const formatTime = (time: Object): string => {
-  if (time.toDateString() === TODAY.toDateString()) return "Hôm nay";
-  return `${time.getDate()}/${time.getMonth() + 1}/${time.getFullYear()}`;
-};
+import { formatTime } from "./formatTime";
 
 type PropType = {
   dispatch: Function,
